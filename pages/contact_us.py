@@ -1,5 +1,7 @@
 import streamlit as st
 
+from services.session import require_login
+
 st.set_page_config(page_title="Contact Us", layout="centered")
 
 
@@ -10,10 +12,7 @@ st.write("If you have any questions or inquiries, feel free to contact us — we
 
 
 
-if st.session_state.logged_user is None:
-    
-    st.warning("You must be logged in to access the chat.")
-    st.stop()
+require_login()
 
 
     

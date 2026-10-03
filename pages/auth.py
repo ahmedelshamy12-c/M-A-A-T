@@ -1,5 +1,4 @@
 import streamlit as st
-import sqlite3
 from services.auth_service import register, login
 
 
@@ -7,6 +6,14 @@ st.set_page_config(page_title="Auth", page_icon="🔐")
 
 
 st.title("🔐Enter Gate ")
+
+if st.session_state.get("logged_user") is not None:
+    user = st.session_state.logged_user
+    st.success(f"Logged in as {user['username']}")
+    if st.button("Go to chat", type="primary"):
+        st.switch_page("pages/chat.py")
+    st.stop()
+
 
 tab1, tab2 = st.tabs(["Log in", "Create Account/register"])
 
@@ -45,18 +52,21 @@ with tab2:
         with col1:  
             username = st.text_input("Choose Username")
             email = st.text_input("Email")
-            ssn = st.text_input("SSN")
+            ssn = st.text_input("National ID (14 digits)")
 
 
         with col2:  
             password = st.text_input("Password", type="password")
             job = st.text_input("Job")
-            age = st.text_input("Age")
+            age = st.number_input("Age", min_value=18, max_value=120, step=1, value=18)
     
     
         if st.form_submit_button("Create Account", use_container_width=True):
 
 
-            register(username, email, password, ssn, job, age)
-
-            st.success("Account created successfully!")
+            try:
+                register(username, email, password, ssn, job, age)
+            except ValueError as error:
+                st.error(str(error))
+            else:
+                st.success("Account created — you can now log in.")
