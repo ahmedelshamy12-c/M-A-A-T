@@ -32,7 +32,7 @@ Streamlit multipage app (v1 `pages/` directory): `app.py` is the landing page, p
 
 ## Conventions
 
-Source `.py` files use CRLF line endings — keep them consistent when editing.
+All text files use LF line endings, enforced by `.gitattributes`.
 
 ## Workflow
 
