@@ -29,13 +29,24 @@ def get_db_path():
     return DEFAULT_DB_PATH
 
 
+# Database files whose schema has been applied by this process.
+_schema_applied = set()
+
+
 def get_connection():
-    """Open the database with `sqlite3.Row` rows and foreign keys enabled."""
+    """Open the database with `sqlite3.Row` rows and foreign keys enabled.
+
+    The first connection to a given file in this process also applies the
+    (idempotent) schema, so a fresh deployment works without `init_db.py`.
+    """
     db_path = get_db_path()
     db_path.parent.mkdir(parents=True, exist_ok=True)
     conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA foreign_keys = ON")
+    if db_path not in _schema_applied:
+        init_schema(conn)
+        _schema_applied.add(db_path)
     return conn
 
 

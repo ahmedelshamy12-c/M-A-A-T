@@ -32,12 +32,17 @@ Goal: finalize Ma`at for the Afro-Asian competition submission.
 
 ## #5 [feature] Persist chat history (follow-up)
 - `Conversations` / `Messages` tables exist but nothing writes to them; chat is per-session only.
-- Status: open (out of scope for the submission)
+- Status: done — saved via `services/chat_history.py`; sidebar lists, reopens, deletes chats
 
 ## #6 [feature] Landing page advertises "Document Summarization" (follow-up)
 - No dedicated summarize action; users can only ask the chat to summarize. Either add a "Summarize" button on the chat page or reword the landing card.
-- Status: open
+- Status: done — "Summarize documents" button on the chat page
 
 ## #7 [bug] Contact form doesn't send or store anything (follow-up)
 - `pages/contact_us.py` only shows a success message.
+- Status: done — stored in `contact_messages`, shown to admins on View Users
+
+## #8 [docs] Deploy to Streamlit Community Cloud
+- Repo prepared: schema and admin are created automatically; secrets come from Streamlit Cloud secrets (exposed as env vars). Steps in README.
+- Needs the user: sign in to share.streamlit.io, create the app, paste secrets.
 - Status: open

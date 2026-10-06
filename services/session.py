@@ -9,7 +9,13 @@ import streamlit as st
 
 USER_KEY = "logged_user"
 # Session-only data that must not survive a logout.
-VOLATILE_KEYS = ("messages", "vectorstore")
+VOLATILE_KEYS = (
+    "messages",
+    "vectorstore",
+    "doc_names",
+    "doc_text",
+    "conversation_id",
+)
 
 
 def require_login(admin: bool = False):

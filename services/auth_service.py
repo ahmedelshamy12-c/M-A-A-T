@@ -7,6 +7,7 @@ a message that is safe to show to the user.
 
 import hashlib
 import hmac
+import os
 import secrets
 import sqlite3
 
@@ -146,6 +147,44 @@ def register(username, email, password, ssn, job, age):
         conn.close()
 
 
+DEFAULT_ADMIN_USERNAME = "admin"
+
+# Database files this process has already checked for the env-configured admin.
+_admin_checked = set()
+
+
+def ensure_env_admin(conn):
+    """Create the admin from ADMIN_EMAIL / ADMIN_PASSWORD if it is missing.
+
+    Returns a log line. Used by `init_db.py`, and by `login()` so that a fresh
+    deployment (where nobody ran `init_db.py`) still gets its admin account.
+    """
+    email = (os.environ.get("ADMIN_EMAIL") or "").strip().lower()
+    password = os.environ.get("ADMIN_PASSWORD") or ""
+    username = (
+        os.environ.get("ADMIN_USERNAME") or ""
+    ).strip() or DEFAULT_ADMIN_USERNAME
+
+    if not email or not password:
+        return "No admin created: set ADMIN_EMAIL and ADMIN_PASSWORD in .env."
+
+    existing = conn.execute(
+        "SELECT id FROM users WHERE email = ?", (email,)
+    ).fetchone()
+    if existing is not None:
+        return f"Admin already exists for {email} (id={existing['id']}); left unchanged."
+
+    conn.execute(
+        """
+        INSERT INTO users (username, email, password, job, age, ssn, role)
+        VALUES (?, ?, ?, NULL, NULL, NULL, 'admin')
+        """,
+        (username, email, hash_password(password)),
+    )
+    conn.commit()
+    return f"Created admin: username={username} email={email}"
+
+
 def login(email, password):
     """Return the session dict for valid credentials, otherwise `None`."""
     email = _clean(email).lower()
@@ -155,6 +194,11 @@ def login(email, password):
 
     conn = db.get_connection()
     try:
+        db_path = db.get_db_path()
+        if db_path not in _admin_checked:
+            ensure_env_admin(conn)
+            _admin_checked.add(db_path)
+
         row = conn.execute(
             "SELECT id, username, email, password, role FROM users WHERE email = ?",
             (email,),

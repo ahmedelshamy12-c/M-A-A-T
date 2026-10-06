@@ -31,3 +31,17 @@ CREATE TABLE IF NOT EXISTS Messages (
 
     FOREIGN KEY (conversation_id) REFERENCES Conversations(id)
 );
+
+CREATE TABLE IF NOT EXISTS contact_messages (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER,
+    name TEXT NOT NULL,
+    email TEXT NOT NULL,
+    message TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_conversations_user ON Conversations(user_id);
+CREATE INDEX IF NOT EXISTS idx_messages_conversation ON Messages(conversation_id);

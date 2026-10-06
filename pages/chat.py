@@ -1,15 +1,13 @@
-"""Chat page: upload PDFs, ask questions, get answers grounded in them.
-
-Answers are Markdown (bold, lists, headings), so they are rendered with plain
-`st.markdown`. Arabic needs no HTML wrapper: a single page-level stylesheet
-gives every paragraph the direction of its own content, which is also what
-keeps mixed Arabic/English answers readable.
-"""
-
 import streamlit as st
 
-from services.documents_service import build_vectorstore
-from services.llm_service import get_ai_response
+from services import chat_history
+from services.documents_service import (
+    RATE_LIMIT_MESSAGE,
+    get_pdf_text,
+    index_text,
+    is_rate_limit,
+)
+from services.llm_service import get_ai_response, summarize_documents
 from services.session import require_login
 
 CHAT_INPUT_PLACEHOLDER = "Ask a question about your documents..."
@@ -30,8 +28,36 @@ st.markdown(CHAT_DIRECTION_CSS, unsafe_allow_html=True)
 st.session_state.setdefault("messages", [])
 st.session_state.setdefault("vectorstore", None)
 st.session_state.setdefault("doc_names", [])
+st.session_state.setdefault("doc_text", "")
+st.session_state.setdefault("conversation_id", None)
 
-require_login()
+user = require_login()
+
+
+def remember(role, content, title_source=None):
+    """Add a message to the visible chat and save it to the user's history.
+
+    The first message of a new chat creates the conversation, titled from
+    `title_source` (or the message itself). A failed save is reported but
+    doesn't interrupt the chat.
+    """
+    st.session_state.messages.append({"role": role, "content": content})
+    try:
+        if st.session_state.conversation_id is None:
+            st.session_state.conversation_id = chat_history.create_conversation(
+                user["id"], chat_history.make_title(title_source or content)
+            )
+        chat_history.add_message(
+            st.session_state.conversation_id, user["id"], role, content
+        )
+    except Exception as e:
+        st.warning(f"This message couldn't be saved to your history: {e}")
+
+
+def start_new_chat():
+    st.session_state.messages = []
+    st.session_state.conversation_id = None
+
 
 with st.sidebar:
     st.header("Documents")
@@ -47,7 +73,15 @@ with st.sidebar:
     if submitted and uploaded_files:
         try:
             with st.spinner("Reading and indexing documents..."):
-                vectorstore = build_vectorstore(uploaded_files)
+                text = get_pdf_text(uploaded_files)
+                bar = st.progress(0.0, text="Indexing...")
+                vectorstore = index_text(
+                    text,
+                    progress=lambda done: bar.progress(
+                        done, text=f"Indexing... {done:.0%}"
+                    ),
+                )
+                bar.empty()
 
             if vectorstore is None:
                 st.error(
@@ -56,12 +90,14 @@ with st.sidebar:
                 )
             else:
                 st.session_state.vectorstore = vectorstore
+                st.session_state.doc_text = text
                 st.session_state.doc_names = [file.name for file in uploaded_files]
                 st.success(
                     f"Indexed {len(st.session_state.doc_names)} document(s)."
                 )
         except Exception as e:
-            st.error(f"Could not process the documents: {str(e)}")
+            reason = RATE_LIMIT_MESSAGE if is_rate_limit(e) else str(e)
+            st.error(f"Could not process the documents: {reason}")
 
     doc_names = st.session_state.doc_names
     if doc_names:
@@ -71,16 +107,65 @@ with st.sidebar:
     else:
         st.caption("No documents loaded — answers will use general knowledge.")
 
-    st.divider()
+    if st.button(
+        "Summarize documents",
+        use_container_width=True,
+        type="primary",
+        disabled=not st.session_state.doc_text,
+    ):
+        names = ", ".join(doc_names)
+        remember(
+            "user",
+            f"Summarize the loaded documents: {names}",
+            title_source=f"Summary: {names}",
+        )
+        with st.spinner("Summarizing..."):
+            summary = summarize_documents(st.session_state.doc_text)
+        remember("assistant", summary)
 
     if st.button("Clear documents", use_container_width=True):
         st.session_state.vectorstore = None
         st.session_state.doc_names = []
+        st.session_state.doc_text = ""
         st.rerun()
 
-    if st.button("Clear chat", use_container_width=True):
-        st.session_state.messages = []
+    st.divider()
+    st.header("Chats")
+
+    if st.button("➕ New chat", use_container_width=True):
+        start_new_chat()
         st.rerun()
+
+    try:
+        conversations = chat_history.list_conversations(user["id"])
+    except Exception as e:
+        conversations = []
+        st.error(f"Could not load your chats: {e}")
+
+    if not conversations:
+        st.caption("Your saved chats will appear here.")
+
+    for conversation in conversations:
+        is_open = conversation["id"] == st.session_state.conversation_id
+        if st.button(
+            conversation["title"] or "Untitled chat",
+            key=f"conversation_{conversation['id']}",
+            use_container_width=True,
+            type="primary" if is_open else "secondary",
+        ):
+            st.session_state.conversation_id = conversation["id"]
+            st.session_state.messages = chat_history.get_messages(
+                conversation["id"], user["id"]
+            )
+            st.rerun()
+
+    if st.session_state.conversation_id is not None:
+        if st.button("🗑️ Delete this chat", use_container_width=True):
+            chat_history.delete_conversation(
+                st.session_state.conversation_id, user["id"]
+            )
+            start_new_chat()
+            st.rerun()
 
 st.title("What do you want to ask today?")
 
@@ -89,9 +174,10 @@ for message in st.session_state.messages:
         st.markdown(message["content"])
 
 if prompt := st.chat_input(CHAT_INPUT_PLACEHOLDER):
-    st.session_state.messages.append({"role": "user", "content": prompt})
+    is_new_chat = st.session_state.conversation_id is None
     with st.chat_message("user"):
         st.markdown(prompt)
+    remember("user", prompt)
 
     with st.chat_message("assistant"):
         with st.spinner("Thinking..."):
@@ -99,5 +185,9 @@ if prompt := st.chat_input(CHAT_INPUT_PLACEHOLDER):
                 prompt, vectorstore=st.session_state.vectorstore
             )
         st.markdown(answer)
+    remember("assistant", answer)
 
-    st.session_state.messages.append({"role": "assistant", "content": answer})
+    # The sidebar was drawn before this chat existed; redraw it so the new
+    # chat shows up in the list right away.
+    if is_new_chat:
+        st.rerun()
