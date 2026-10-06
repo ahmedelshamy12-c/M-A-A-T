@@ -13,7 +13,7 @@
 |-------|-------|
 | **Project Title** | Ma`at |
 | **Project Type** | Web App / AI Tool |
-| **Description** | An AI-powered web app for helping people understand Egyptian law. The user uploads their own legal PDF — a law, a contract, or a court ruling — and asks questions about it in Arabic or English. A retrieval-augmented generation (RAG) pipeline finds the relevant passages inside that PDF and Google Gemini writes the answer from them. |
+| **Description** | An AI-powered web app for helping people understand Egyptian law. The user uploads their own legal PDF — a law, a contract, or a court ruling — and asks questions about it in Arabic or English. A very simple retrieval-augmented generation (RAG) design finds the parts of the PDF that match the question, and Google Gemini writes the answer from them. The code is kept deliberately basic — plain variables, plain functions, and only three libraries — so that a beginner can read every line. |
 | **Target Users** | Law students, Egyptian citizens, researchers, and small legal practices. |
 | **Resolution / Platform** | Mobile-responsive website — runs in any web browser on a desktop, a tablet, or a phone. |
 | **Date** | 9/8/2026 |
@@ -22,26 +22,21 @@
 
 | Category | Technology | Purpose |
 |----------|-----------|---------|
-| **Language** | Python 3 | The entire project — web app, AI pipeline, and database layer — is written in Python. |
-| **Framework** | Streamlit | Builds the multi-page website directly from Python, so no separate front-end code has to be written or maintained. |
-| **Database** | SQLite | Stores user accounts in a single file, `data/data_base.db`, opened through Python's built-in `sqlite3` module. |
-| **AI / LLM** | google-genai | Calls Google Gemini to write each answer (`gemini-2.5-flash`). |
-| **Libraries** | langchain-google-genai, langchain-community, langchain-text-splitters, faiss-cpu, pypdf, python-dotenv | Split the document into chunks, embed them, search them, and read the API key from `.env` (details in the Dependencies table below). |
+| **Language** | Python 3 | The whole project is written in Python. |
+| **Framework** | Streamlit | Builds the website directly from Python: pages, buttons, forms, chat bubbles, and the top menu. |
+| **Database** | SQLite | Stores users, saved chats, and contact messages in one file, `data/data_base.db`, using Python's built-in `sqlite3` module. |
+| **AI** | Google Gemini (`google-genai`) | `gemini-embedding-001` turns text into numbers for searching; `gemini-2.5-flash` writes the answers and summaries. |
+| **PDF reading** | pypdf | Reads the text out of the uploaded PDF. |
 
 ### Dependencies | المكتبات المستخدمة
 
-All versions are pinned exactly as installed from `requirements.txt`.
+Only three libraries are installed (`requirements.txt`); everything else comes with Python.
 
 | Package | Version | Purpose |
 |---------|---------|---------|
-| streamlit | 1.65.0 | Builds the multi-page web interface (landing, log-in, chat, contact, admin) in Python. |
-| python-dotenv | 1.2.4 | Loads `GOOGLE_API_KEY` and the optional settings from a `.env` file instead of hard-coding them. |
-| pypdf | 6.19.0 | Extracts the text of every page from the uploaded PDF files. |
-| langchain-text-splitters | 1.1.3 | `RecursiveCharacterTextSplitter` cuts the PDF text into overlapping chunks of 2000 characters (250-character overlap). |
-| langchain-community | 0.4.2 | Supplies the `FAISS` vector store used to search those chunks. |
-| langchain-google-genai | 4.4.0 | Connects the Gemini embedding model (`gemini-embedding-2`) to LangChain. |
-| faiss-cpu | 1.15.1 | Facebook's vector-search library — the index that finds the chunks closest to a question. |
-| google-genai | 2.28.0 | Google's current Gemini SDK — sends the prompt and returns the written answer. |
+| streamlit | 1.65.0 | The web interface. |
+| pypdf | 6.19.0 | Reads the text of every page of the PDF. |
+| google-genai | 2.28.0 | Talks to Google Gemini: embeddings for search, and the written answers. |
 
 <!-- Screenshot: Main screen of your project -->
 
@@ -80,94 +75,87 @@ Ma`at takes the second idea — professional help with a real document — and m
 
 ```
 maat/
-├── app.py                  # Entry point / landing page
-├── init_db.py              # Creates the SQLite database (--reset to start over)
-├── requirements.txt        # Pinned Python dependencies
-├── README.md               # Setup, models, admin account, project layout
-├── CLAUDE.md               # Notes for AI coding assistants working on the repo
-├── ISSUES.md               # Work items and their status
-├── .env.example            # Template for the API key and the optional settings
-├── docs/
-│   └── afro_asian_software_template.md   # This competition document
-├── pages/                  # Streamlit multi-page user interface
-│   ├── auth.py             # Log in / create account
-│   ├── chat.py             # PDF upload, indexing, and the Q&A chat
-│   ├── contact_us.py       # Contact details and contact form
-│   └── view_users.py       # Admin-only list of accounts
-├── services/               # All application logic, no UI code
-│   ├── db.py               # The only module that opens SQLite; also applies the schema
-│   ├── auth_service.py     # Sign-up, log-in, password hashing, validation
-│   ├── session.py          # require_login() page guard + log-out button
-│   ├── chat_history.py     # Saved conversations and messages, per user
-│   ├── contact_service.py  # Stores and lists Contact Us messages
-│   ├── documents_service.py # PDF -> text -> chunks -> FAISS index
-│   └── llm_service.py      # Retrieval + Gemini prompts + answers and summaries
-└── data/
-    ├── schema.sql          # Database schema (idempotent)
-    └── data_base.db        # The database file (generated, not in version control)
+├── app.py              # Start of the app: creates the tables and builds the menu
+├── services/           # Small functions, one file per topic
+│   ├── database.py         # Opens the database, creates the tables
+│   ├── user_service.py     # Sign up, log in, list users
+│   ├── chat_service.py     # Save and load chats
+│   ├── contact_service.py  # Save and list contact messages
+│   ├── pdf_service.py      # Read the PDF, cut it into parts
+│   └── ai_service.py       # Gemini: embeddings, best parts, answers, summaries
+├── app_pages/
+│   ├── home.py         # Welcome page
+│   ├── login.py        # Log in / Sign up tabs
+│   ├── chat.py         # Upload a PDF, ask questions, summarize, saved chats
+│   ├── contact.py      # Contact details and a message form
+│   ├── admin.py        # Users and contact messages (admin only)
+│   └── logout.py       # Logs the user out
+├── data/
+│   ├── schema.sql      # The database tables
+│   └── data_base.db    # The database file (made automatically, not in git)
+├── .streamlit/
+│   └── secrets.toml.example  # Where the Gemini API key goes
+├── requirements.txt    # The 3 libraries
+├── README.md
+└── docs/afro_asian_software_template.md   # This document
 ```
 
 ### Architecture Diagram | مخطط البنية
 
 ```
-                     ┌────────────────────────────┐
-                     │       Browser              │
-                     │   (no front-end code)      │
-                     └────────┬───────────────────┘
-                              │ clicks / typing
- ┌────────────────────────────▼───────────────────────────────┐
- │  Streamlit pages      app.py + pages/                      │
- │  Landing, Auth, Chat, Contact Us, View Users               │
- │  Session state, held in the Streamlit server's memory:     │
- │    logged_user, messages, vectorstore, doc_text, ...       │
- └────────┬───────────────────┬───────────────────────────────┘
-          │ import            │ import
- ┌────────▼───────────────────▼───────────────────────────────┐
- │  services/                                                 │
- │  session.py, auth_service.py, db.py, chat_history.py,      │
- │  contact_service.py, documents_service.py, llm_service.py  │
- └────────┬───────────────────┬───────────────────────────────┘
-          │ parameterised SQL │ vectors in / prompts out
- ┌────────▼───────────┐  ┌────▼──────────────────────────────┐
- │  SQLite            │  │  Google Gemini API                │
- │  data/data_base.db │  │  embeddings: gemini-embedding-2   │
- │  users, chats,     │  │  generation: gemini-2.5-flash     │
- │  contact messages  │  │  api key: GOOGLE_API_KEY from .env│
- └────────────────────┘  └───────────────────────────────────┘
+ ┌───────────────────────────────────────────┐
+ │  Browser                                  │
+ └─────────────────────┬─────────────────────┘
+                       │
+ ┌─────────────────────▼─────────────────────┐
+ │  app.py  (menu)  ->  app_pages/*.py       │
+ └─────────────────────┬─────────────────────┘
+                       │ calls functions in
+ ┌─────────────────────▼─────────────────────┐
+ │  services/  (database, user, chat,        │
+ │            contact, pdf, ai)              │
+ └──────────┬──────────────────────┬─────────┘
+            │                      │
+ ┌──────────▼─────────┐  ┌─────────▼─────────────────┐
+ │  SQLite            │  │  Google Gemini            │
+ │  data/data_base.db │  │  gemini-embedding-001     │
+ │  users, chats,     │  │  gemini-2.5-flash         │
+ │  messages, contact │  │                           │
+ └────────────────────┘  └───────────────────────────┘
 
- UPLOAD PATH   PDF -> pypdf reads the text -> 2000-char chunks (250 overlap)
-               -> the chunk text is sent to the Gemini embeddings API
-               -> the FAISS index is held in the Streamlit server's memory
-                  for this session and is lost when the session ends; the
-                  uploaded PDF files themselves are never written to disk
+ UPLOAD   PDF -> read the text -> cut it every 2000 characters
+          -> (more than 90 parts? refuse the file)
+          -> Gemini turns every part into a list of numbers (embedding)
+          -> keep the parts and their numbers in the user's session
 
- ASK PATH      question -> FAISS similarity search, top 3 chunks
-               -> the excerpts + the question are sent to Gemini, which
-                  writes the answer (cites article numbers, replies in the
-                  language of the question) -> shown in the chat
-               -> if nothing is retrieved, or no PDF is loaded, Gemini is
-                  asked to answer from general knowledge and to say that
-                  the answer is not from the documents
+ ASK      question -> Gemini turns it into numbers
+          -> score every part: multiply the numbers pair by pair and add them
+          -> send the 5 best parts + the question to Gemini -> answer
+          (no PDF yet? Gemini answers from general knowledge and says so)
+
+ SUMMARY  the whole PDF text -> Gemini -> a simple summary
 ```
+
+The uploaded PDF and its text are sent to Google's Gemini service to be processed. The PDF file itself is not saved on the server.
 
 ### Key Files | الملفات الرئيسية
 
 | File | Purpose | Lines of Code |
 |------|---------|:-------------:|
-| app.py | Landing page: title, subtitle, disclaimer, the two-column overview, and the button that opens the Auth page. | 63 |
-| pages/auth.py | Log-in and create-account tabs; the only page a signed-out visitor can fully use. | 72 |
-| pages/chat.py | Sidebar PDF uploader, loaded-document list, Summarize button, saved-chat list (open, new, delete), question box; calls the AI and chat-history services. | 188 |
-| pages/contact_us.py | Contact information (email, phone, address) and a name/email/message form that saves the message for the admins. | 36 |
-| pages/view_users.py | Admin-only page with two tabs: account cards with masked national IDs, and the Contact Us messages. | 81 |
-| services/auth_service.py | Sign-up validation, PBKDF2-SHA256 password hashing, log-in check, admin account from environment variables; no Streamlit import, so it can be tested without a UI. | 219 |
-| services/db.py | The single place that opens SQLite (row factory, foreign keys on, path from `EGY_LAW_DB` or `data/`) and applies the schema automatically on first use. | 61 |
-| services/documents_service.py | Uploaded PDFs -> text -> overlapping chunks -> FAISS vector store. | 73 |
-| services/llm_service.py | Top-3 retrieval, the Gemini prompts (with context / without context / summary), and the answer or the `"Error: ..."` string. | 154 |
-| services/session.py | `require_login()` page guard, the admin check, the log-out button, and session cleanup on log-out. | 53 |
-| services/chat_history.py | Creates, lists, loads and deletes a user's saved conversations; every query checks the owner. | 119 |
-| services/contact_service.py | Validates and stores Contact Us messages, and lists them for admins. | 55 |
-| init_db.py | Creates `data/data_base.db` from the schema (optionally from scratch with `--reset`) and seeds the admin account from `ADMIN_EMAIL` / `ADMIN_PASSWORD`. | 62 |
-| data/schema.sql | The `users`, `Conversations`, `Messages`, and `contact_messages` tables. | 47 |
+| app.py | Creates the database tables and shows a different menu before login, after login, and for the admin. | 29 |
+| services/database.py | Opens the database and creates the tables from `schema.sql`. | 19 |
+| services/user_service.py | Sign up (first user becomes admin), log in, list users. | 51 |
+| services/chat_service.py | Create a chat, save a message, list chats, load a chat. | 45 |
+| services/contact_service.py | Save and list contact messages. | 24 |
+| services/pdf_service.py | Read the PDF text and cut it into parts of 2000 characters. | 24 |
+| services/ai_service.py | Gemini: embeddings, the similarity score, the 5 best parts, answers and summaries. | 103 |
+| app_pages/home.py | Welcome page with three cards (Upload, Ask, Summarize). | 31 |
+| app_pages/login.py | Log in and Sign up forms with simple checks. | 40 |
+| app_pages/chat.py | The main screen: PDF upload, summary button, saved chats, and the conversation, with suggested-question pills. | 159 |
+| app_pages/contact.py | Contact details and a message form saved to the database. | 30 |
+| app_pages/admin.py | Two tabs: the users table and the contact messages. | 30 |
+| app_pages/logout.py | Clears the session and goes back home. | 5 |
+| data/schema.sql | The four tables. | 37 |
 
 ---
 
@@ -181,71 +169,53 @@ maat/
 
 | # | Feature | Description | Status |
 |---|---------|-------------|:------:|
-| 1 | Register an account | The create-account tab asks for username, email, national ID (14 digits), password, job, and age (18–120). Every field is validated before the account is written, and duplicate username / email / national ID are reported as readable messages instead of crashing. | ✅ |
-| 2 | Password hashing | Passwords are never stored. Each one is hashed with PBKDF2-HMAC-SHA256 using 600,000 iterations and a random 16-byte salt, and compared with a constant-time check. | ✅ |
-| 3 | Log in and log out | Log-in takes email + password and returns the account (id, username, email, role) into the session. The sidebar log-out button clears the user, the chat, and the document index, then returns to the landing page. | ✅ |
-| 4 | Page protection | Every protected page calls one shared guard: signed-out visitors get a warning and a link to the Auth page instead of a broken page. | ✅ |
-| 5 | PDF upload and indexing | One or more PDFs are uploaded in the sidebar; pypdf reads the page text, Arabic text stored in visual order is repaired, it is split into 2000-character chunks with 250 characters of overlap, embedded with Gemini in batches that respect the free-tier quota (with a progress bar), and indexed with FAISS. The index is held in the Streamlit **server's** memory for that user's session and is lost when the session ends; the PDF files themselves are never written to disk. | ✅ |
-| 6 | Grounded Q&A with article citations | The three chunks most similar to the question are sent to Gemini with a prompt that allows only those excerpts, asks it to cite article numbers, to say so plainly when the excerpts do not answer the question, and to reply in the same language as the question (Arabic in, Arabic out). | ✅ |
-| 7 | General-knowledge fallback | With no document loaded, or no matching chunk, the assistant answers from its own knowledge and states clearly that the answer is not based on the user's documents. | ✅ |
-| 8 | Admin-only user list | Admins see every account newest-first in a three-column card grid (username, email, role, job, age, national ID). The national ID is masked — ten asterisks plus the last four digits. Non-admins are refused. | ✅ |
-| 9 | Contact page | Shows the contact email, phone, and address, plus a name/email/message form (pre-filled with the user's name and email). Messages are validated, saved to the database, and shown to admins on the View Users page. | ✅ |
-| 10 | Bilingual rendering | Answers keep their Markdown (bold, lists, headings) and a page-level `unicode-bidi: plaintext` stylesheet gives each paragraph the direction of its own content, so Arabic and English both read correctly. | ✅ |
-| 11 | Saved chat history | Every question and answer is saved to the `Conversations` and `Messages` tables. The sidebar lists the user's chats (newest first, titled from the first question); a chat can be reopened, a new one started, or the open one deleted. Users only ever see their own chats. The uploaded documents themselves are not saved, so they must be uploaded again in a new session. | ✅ |
-| 12 | Document summary | A "Summarize documents" button sends the full text of the loaded PDFs to Gemini and adds a plain-language summary to the chat — key points, rights and obligations, deadlines, penalties, article numbers — written in the documents' language. Very long documents are cut at 300,000 characters and the summary says so. | ✅ |
-| 13 | Scanned (image-only) PDFs | Not supported — a PDF with no extractable text returns "No readable text found in these PDFs". There is no OCR step. | ❌ |
+| 1 | Sign up | Username, email, password, national ID, job and age. Empty boxes and an already-used username or email are refused with a message. The first person to sign up becomes the admin. | ✅ |
+| 2 | Log in and log out | Log in with email and password. Log out forgets everything about the user in this session. | ✅ |
+| 3 | Smart menu | Before login the menu shows only Home and Log in; after login it shows Chat, Home, Contact us and Log out; the admin also sees Admin. | ✅ |
+| 4 | PDF upload | One PDF at a time. The text is cut into parts of 2000 characters; files with more than 90 parts are refused (to stay inside Gemini's free limit). | ✅ |
+| 5 | Questions and answers (RAG) | The 5 parts closest in meaning to the question are found with Gemini embeddings and a simple score, and Gemini answers only from them, with article numbers when possible. | ✅ |
+| 6 | Suggested questions | Clickable pills above the question box ("What is this document about?", "What are my rights?", "Are there any deadlines or dates?"...). One click asks the question. | ✅ |
+| 7 | Answer language | If the question has Arabic letters the answer is in Arabic, otherwise in English. | ✅ |
+| 8 | No PDF? | Gemini answers from general knowledge and says the answer is not from a document. | ✅ |
+| 9 | Summary | One button summarizes the whole document in its own language. | ✅ |
+| 10 | Saved chats | Every chat is saved; the sidebar lists them so the user can reopen one or start a new chat. | ✅ |
+| 11 | Contact us | A message form saved to the database. | ✅ |
+| 12 | Admin page | A table of all users and a list of the contact messages. | ✅ |
+| 13 | Scanned PDFs | Not supported — the app says the PDF has no readable text. | ❌ |
 
 > Status: ✅ Complete | ⏳ In Progress | ❌ Not Started
+
+> Known limits (kept on purpose to keep the code simple): passwords are stored as plain text, there is no error handling (for example, if Gemini's free quota runs out the page shows an error), and some Arabic PDFs that store their text in visual order come out with words reversed.
 
 ### User Flow | تدفق المستخدم
 
 ```
-             ┌────────────────────────┐
-             │     LANDING PAGE       │
-             │       app.py           │
-             └────────────┬───────────┘
-                          │ "Log in / Create Account"
-             ┌────────────▼───────────┐
-             │      AUTH PAGE         │
-             │    pages/auth.py       │
-             └────────────┬───────────┘
-                          │ valid credentials
-               ┌──────────▼───────────────────────┐
-               │          CHAT PAGE               │
-               │       pages/chat.py              │
-               │  sidebar: upload PDF, index it   │
-               │  main: ask, read the answer      │
-               └──────┬───────────────────┬───────┘
-                      │                   │
-           ┌──────────▼─────────────┐  ┌──▼───────────────────────┐
-           │   CONTACT US PAGE      │  │    VIEW USERS PAGE       │
-           │  pages/contact_us.py   │  │   pages/view_users.py    │
-           │  details + a form      │  │   admin only, IDs masked │
-           │  (any logged-in user)  │  │   (admins only)          │
-           └────────────────────────┘  └──────────────────────────┘
-
-  Streamlit's sidebar lists five entries — the landing page plus Auth,
-  Chat, Contact Us and View Users — so the user can move between them at
-  any time.
-
-  Guard rails:
-   - a protected page opened without logging in  ->  "You must be logged in
-     to view this page." plus a link back to the Auth page; nothing else
-     renders
-   - View Users opened by a non-admin            ->  "Admins only."
-   - Log out                                     ->  clears the user, the
-     chat and the document index, then returns to the landing page
+   ┌──────────┐     ┌──────────┐
+   │   Home   │ ──► │  Log in  │
+   └──────────┘     └────┬─────┘
+                         │ correct email + password
+                    ┌────▼─────┐
+                    │   Chat   │ ◄── the start page after login
+                    └────┬─────┘
+           ┌─────────────┼──────────────┐
+      ┌────▼─────┐  ┌────▼─────┐   ┌────▼─────┐
+      │ Contact  │  │  Admin   │   │ Log out  │
+      │    us    │  │ (admin)  │   │          │
+      └──────────┘  └──────────┘   └──────────┘
 ```
+
+The menu is at the top of the page and only shows the pages the user is allowed to open.
 
 ### Screen Reference | دليل الشاشات
 
-| Screen | File / Route | Description | Transitions To |
-|--------|-------------|-------------|----------------|
-| Landing | `app.py` (first page Streamlit shows) | Wide page: the ⚖️ Ma`at title centred in large dark text, a grey subtitle, a blue note that the app gives general information and is not legal advice, then two equal columns — "📄 Document Summarization" and "💬 Ask the Assistant" — and a highlighted "Log in / Create Account" button. | Auth (via the button); the sidebar also links to the other pages |
-| Auth | `pages/auth.py` | Two tabs. **Log in**: email + password. **Create Account/register**: username, email, national ID (14 digits), password, job, age (18–120). Invalid input is shown as a red message; a new account is confirmed and the user then logs in. If someone is already logged in, the page shows who they are with a "Go to chat" button. | Chat (after a successful log-in), or the landing page |
-| Chat | `pages/chat.py` (login required) | Wide layout. **Sidebar**: a "Documents" header, a multi-file PDF uploader with a "Process documents" button, a green "Indexed N document(s)" confirmation or a red error, the list of loaded documents, "Summarize documents" and "Clear documents" buttons, then a "Chats" section with "➕ New chat", the saved chats, and "🗑️ Delete this chat"; the log-out panel sits above them. **Main area**: the heading "What do you want to ask today?", the conversation as chat bubbles with Markdown answers, and the box "Ask a question about your documents...". | Sidebar navigation to Auth, Contact Us, View Users; landing page after log-out |
-| Contact Us | `pages/contact_us.py` (login required) | Centred layout: a short invitation, then the contact email, phone number, and Cairo address, then a three-field form (Name, Email, Message) whose Send button saves the message and shows a thank-you, or shows "Please fill out all fields." | Sidebar navigation; admins read the message on View Users |
-| View Users | `pages/view_users.py` (admins only) | Wide layout with two tabs. **Users**: account cards, three per row, newest first. Each card shows the username as a heading plus email, role, job, age, and the national ID with only the last four digits visible. **Contact messages**: each message with its date, sender email and account. Non-admin users are stopped with "Admins only." | Sidebar navigation; back to the landing page after log-out |
+| Screen | File | Description | Transitions To |
+|--------|------|-------------|----------------|
+| Home | `app_pages/home.py` | Title, a "not legal advice" note, three cards (Upload, Ask, Summarize) and a button. | Log in (or Chat if logged in) |
+| Log in | `app_pages/login.py` | Two tabs: Log in, and Sign up. | Chat, after logging in |
+| Chat | `app_pages/chat.py` | Sidebar: upload a PDF, Summarize button, New chat, saved chats. Main area: the conversation, suggested-question pills, and the question box. | Any page in the menu |
+| Contact us | `app_pages/contact.py` | Contact details and a Name / Email / Message form. | Any page in the menu |
+| Admin | `app_pages/admin.py` | Tabs: Users (a table) and Contact messages. Admin only. | Any page in the menu |
+| Log out | `app_pages/logout.py` | Logs out and returns to Home. | Home |
 
 ---
 
@@ -257,45 +227,35 @@ maat/
 
 ### Screenshots | لقطات الشاشة
 
-<!-- Screenshot: Landing page -->
-**Landing Page**: One wide page, read from top to bottom: the scales emoji ⚖️ and "Ma`at" in large dark blue-grey letters centred on the screen, a grey subtitle line under it ("Smart System for Assisting with Understanding Egyptian Legal Documents"), a blue information box repeating that the assistant gives general information and is not a replacement for a qualified attorney, then two equal columns side by side — "📄 Document Summarization" on the left, "💬 Ask the Assistant" on the right — a horizontal divider, and one highlighted "Log in / Create Account" button as the single call to action.
+<!-- Screenshot: Home page -->
+**Home**: The ⚖️ Ma`at title, a blue "not legal advice" note, three bordered cards side by side — Upload, Ask, Summarize — and one "Log in / Sign up" button.
 
-<!-- Screenshot: Main dashboard -->
-**Dashboard (Chat page)**: A wide screen split into a narrow sidebar and a large conversation area. The sidebar reads "Documents", contains the "Upload PDF documents" box and a full-width "Process documents" button, then either a green "Indexed 2 document(s)." confirmation or a red error message, then a "Loaded documents" list of file names (or the caption "No documents loaded — answers will use general knowledge."), the "Summarize documents" and "Clear documents" buttons, a divider, and the "Chats" section listing the user's saved chats with "➕ New chat" and "🗑️ Delete this chat". Above them sits the shared panel showing who is logged in and the "Log out" button. The main area is headed "What do you want to ask today?", shows the earlier questions and answers as chat bubbles with Markdown formatting, and ends with the input box "Ask a question about your documents...". Arabic answers are laid out right-to-left, English answers left-to-right.
+<!-- Screenshot: Log in page -->
+**Log in**: Two tabs. "Log in" has Email and Password; "Sign up" has Username, Email, Password, National ID, Job and Age.
 
-<!-- Screenshot: Key feature screen -->
-**Key Feature (a question being answered)**: The chat area a moment after a question has been sent — the user's question in its own bubble, then Gemini's reply in the assistant's bubble below it. The reply is Markdown, so it can carry bold lead-ins and bullet lists, it quotes the wording and the article numbers taken from the uploaded document, is written in the same language as the question, and finishes with a one-line reminder that this is general information and not legal advice. While the model is working, a "Thinking..." spinner occupies the assistant bubble.
+<!-- Screenshot: Chat page -->
+**Chat**: The sidebar holds the PDF uploader, a green "Ready: file.pdf" note, the "Summarize the document" button, "New chat" and the list of saved chats. The main area shows the conversation as chat bubbles, a row of suggested-question pills, and the question box at the bottom.
 
-<!-- Screenshot: Log-in and sign-up page -->
-**Auth Page**: A single screen headed "🔐Enter Gate" with two tabs. The open "Log in" tab holds two stacked boxes — Email and a masked Password — and a full-width "Login" button; a red "Invalid login credentials." message appears under it when the details are wrong. The "Create Account/register" tab holds a two-column form: username, email, and a 14-digit national ID on the left; a masked password, a job field, and an age selector restricted to 18–120 on the right; then a full-width "Create Account" button.
-
-<!-- Screenshot: Admin user list -->
-**View Users Page (admin)**: A wide grid of user cards, three across. Each card starts with the username as a heading and lists "Email:", "Role:", "Job:", "Age:", and "National ID:" — where the national ID is shown as ten asterisks followed by the last four digits (for example `**********1234`), so an administrator can identify an account without reading the full ID.
-
-<!-- Add more screenshots as needed -->
+<!-- Screenshot: Admin page -->
+**Admin**: A table of all users and a tab with the contact messages.
 
 ### Design System | نظام التصميم
 
-The interface is deliberately plain: almost all of it is Streamlit's own widgets in its default theme, and the only custom styling is a few lines of CSS on the landing page.
-
 | Element | Style |
 |---------|-------|
-| **Primary Color** | `#2c3e50` (dark blue-grey) — used for the ⚖️ Ma`at title on the landing page |
-| **Secondary Color** | `#7f8c8d` (grey) — used for the subtitle under the title |
-| **Font** | Streamlit's built-in font in its default theme; no custom web font is loaded, so headings and body text use the standard system sans-serif |
-| **Button Style** | Streamlit's flat default buttons; the landing-page call to action and the form submit buttons use the highlighted **primary** style, other buttons the plain style. Rounded corners come from the theme, not from custom CSS. |
-| **Layout** | Streamlit's built-in sidebar navigation with five entries — the landing page plus Auth, Chat, Contact Us and View Users. The landing page is a centred title above two equal columns; the Chat page adds its own "Documents" sidebar panel next to the navigation; the Contact Us page uses the narrow **centered** layout; everything else uses **wide**. |
-| **Status Feedback** | Streamlit's standard messages throughout: blue `st.info` for the landing disclaimer, green `st.success` for "Indexed N document(s).", "Login successful!" and the contact thank-you, red `st.error` for failed log-in, empty fields and unreadable PDFs, and yellow `st.warning` for the not-logged-in guard |
+| **Colors** | Streamlit's default theme (light or dark, following the user's device). |
+| **Font** | Streamlit's default font. |
+| **Icons** | Material icons in the menu and buttons (home, chat, mail, upload, summarize). |
+| **Buttons** | The main action on each screen is a highlighted "primary" button. |
+| **Layout** | A top menu, wide pages, bordered cards on the home page, and a sidebar on the chat page. |
 
 ### Responsive Design | التصميم المتجاوب
 
-There is no custom CSS breakpoint in the project — responsiveness comes from Streamlit's own layout engine, which reflows the page to the browser width.
-
 | Breakpoint | Layout | Tested? |
 |------------|--------|:-------:|
-| Desktop (1024px+) | Streamlit's **wide** layout on the landing, Chat and View Users pages: the landing page's two columns sit side by side, and View Users shows three user cards per row. On the Chat page the "Documents" sidebar sits next to the conversation. | ☐ |
-| Tablet (768-1024px) | Same page, narrower: the columns and cards shrink to the available width and stay side by side. The sidebar can be collapsed with Streamlit's sidebar control to give the content the full width. | ☐ |
-| Mobile (< 768px) | Streamlit stacks the columns and cards vertically — one column per block and one user card per row — and the navigation and document panels collapse behind their menu buttons. | ☐ |
+| Desktop (1024px+) | Top menu, three cards in a row, chat sidebar open. | ☐ |
+| Tablet (768-1024px) | Same layout, narrower. | ☐ |
+| Mobile (< 768px) | Cards stack under each other and the chat sidebar folds away behind a button. | ☐ |
 
 ---
 
@@ -309,32 +269,28 @@ There is no custom CSS breakpoint in the project — responsiveness comes from S
 
 | Source | Type | Description |
 |--------|------|-------------|
-| Uploaded PDF files | User Input | The laws, contracts, and court rulings the user uploads on the Chat page. Their text is read with pypdf and cut into 2000-character chunks; **the chunk text is sent to Google's Gemini API** to be embedded, and the three retrieved excerpts are sent with every question, so the content of the uploaded documents leaves the app and is processed by an external service. The FAISS index is held in the Streamlit server's memory for the session; the PDF files themselves are never written to the server's disk. |
-| Sign-up form | User Input | Username, email, password, national ID, job, and age, typed on the Auth page and validated (unique username / email / national ID, 14-digit ID, password of at least 8 characters, age 18–120) before the account is created. |
-| Google Gemini — generation | API | `gemini-2.5-flash` writes each answer from the retrieved excerpts, or from general knowledge when there is nothing to retrieve. Authenticated with `GOOGLE_API_KEY` from `.env`. |
-| Google Gemini — embeddings | API | `gemini-embedding-2` converts each document chunk into a vector so FAISS can search it. |
-| SQLite database file | Database | `data/data_base.db`, created by `python init_db.py` from `data/schema.sql`. Holds user accounts, saved chats and contact messages. The app creates the tables itself on first use (so a fresh deployment works without running `init_db.py`); its location can be moved with the `EGY_LAW_DB` environment variable. |
-| Text written in the code | Static | The assistant's identity, its rules, and its prompt templates (answer with documents, answer without documents, summary) live in `services/llm_service.py`; the interface wording lives in the page files; `.env` supplies the API key and the admin credentials. |
+| Uploaded PDF | User Input | The law, contract or ruling the user uploads. Its text is sent to Google Gemini; the file itself is not saved. |
+| Sign-up form | User Input | Username, email, password, national ID, job and age. |
+| Chats and contact form | User Input | Questions, answers and messages, saved in the database. |
+| Google Gemini | API | Embeddings for searching and the written answers and summaries. |
 
 ### Database Schema | مخطط قاعدة البيانات
 
-Schema from `data/schema.sql`. Every statement uses `CREATE TABLE IF NOT EXISTS`, so running `python init_db.py` again is safe.
-
 | Table | Columns | Description |
 |-------|---------|-------------|
-| `users` | `id` (primary key), `username` (unique, required), `email` (unique, required), `password` (PBKDF2-SHA256 hash, required), `job`, `age`, `ssn` (unique, 14-digit Egyptian national ID), `role` (`user` or `admin`, default `user`), `created_at` | One row per account. Written by sign-up and by the admin seeding in `init_db.py`, read by log-in, and listed by the admin page. Passwords are stored only as hashes. |
-| `Conversations` | `id` (primary key), `user_id` (foreign key → `users.id`), `title`, `created_at` | One row per saved chat, titled from its first question. Every read and delete checks that the chat belongs to the logged-in user. |
-| `Messages` | `id` (primary key), `conversation_id` (foreign key → `Conversations.id`), `sender`, `message`, `created_at` | One row per question, answer, or summary; `sender` is `user` or `assistant`. |
-| `contact_messages` | `id` (primary key), `user_id` (foreign key → `users.id`, set to empty if the account is deleted), `name`, `email`, `message`, `created_at` | One row per Contact Us message, shown to admins on the View Users page. |
+| `users` | `id`, `username`, `email`, `password`, `ssn`, `job`, `age`, `role`, `created_at` | One row per account. `role` is `admin` for the first user and `user` for everyone else. |
+| `chats` | `id`, `user_id`, `title`, `created_at` | One row per saved chat; the title is the start of the first message. |
+| `messages` | `id`, `chat_id`, `sender`, `text`, `created_at` | Every question (`user`) and answer (`assistant`). |
+| `contact_messages` | `id`, `user_id`, `name`, `email`, `message`, `created_at` | Messages from the Contact us page. |
 
 ### External APIs (if any) | واجهات برمجة التطبيقات
 
 | API | Purpose | Rate Limit |
 |-----|---------|------------|
-| Google Gemini — text generation (`gemini-2.5-flash`) | Writes each answer, using the three excerpts retrieved from the user's PDF; falls back to general knowledge when nothing is retrieved. | Depends on the Google AI Studio plan (free tier is limited) |
-| Google Gemini — embeddings (`gemini-embedding-2`) | Turns each document chunk into a vector when a PDF is uploaded, so FAISS can search it. | Depends on the Google AI Studio plan (free tier is limited) |
+| Gemini `gemini-embedding-001` | Turns PDF parts and questions into numbers for searching. | Free plan: about 100 parts per minute, and a daily limit — that is why big PDFs are refused. |
+| Gemini `gemini-2.5-flash` | Writes the answers and summaries. | Depends on the Google AI Studio plan. |
 
-Both models are read from `.env` (`GEMINI_MODEL`, `EMBEDDING_MODEL`), so they can be changed without editing any code.
+The API key is kept in `.streamlit/secrets.toml` (never in the code).
 
 ---
 
@@ -348,13 +304,12 @@ Both models are read from `.env` (`GEMINI_MODEL`, `EMBEDDING_MODEL`), so they ca
 
 By the end of this project, the student will be able to:
 
-1. Build a **retrieval-augmented generation (RAG)** pipeline end to end: read a document, split it, index it, retrieve the relevant parts for a question, and prompt a language model to answer only from those parts.
-2. Explain **text embeddings and vector search** — what an embedding is, why FAISS finds chunks by meaning rather than by keyword (which matters for Arabic, where the same idea is often written in different words), and why chunks of 1000 characters with 200 characters of overlap retrieve better than whole pages.
-3. **Design prompts for reliability**: separate prompts for "answer only from these excerpts" and "answer from general knowledge", instruct the model to cite article numbers, to reply in the same language as the question, and to admit when the documents do not contain the answer instead of inventing one.
-4. **Store passwords safely** — PBKDF2-HMAC-SHA256 with 600,000 iterations, a random per-user salt, constant-time comparison, and never keeping plaintext; plus input validation that turns database errors into messages a user can act on.
-5. **Design and query a relational database in SQLite** — primary keys, unique constraints, foreign keys, the `role` check constraint, and why every query uses parameter placeholders instead of string concatenation.
-6. **Build a multi-page web application in Streamlit**, including `st.session_state` for per-user state and a single shared `require_login()` guard so that "not logged in" and "admins only" are handled in one place for every page.
-7. **Separate the interface from the logic** — pages contain UI only, services contain the business logic, so the logic can be exercised without a browser.
+1. Explain and build a **simple RAG system**: cut a document into parts, find the parts that match a question, and ask an AI to answer only from them.
+2. Explain **embeddings**: how an AI turns text into a list of numbers, and how multiplying two lists and adding the results measures how close two meanings are.
+3. **Write clear prompts**: tell the AI which text to use, which language to answer in, and to say "I don't know" instead of inventing.
+4. **Use a database** with SQLite: create tables, add rows, and find rows with `SELECT ... WHERE`.
+5. **Build a multi-page website** with Streamlit: pages, a menu, forms, tabs, chat bubbles, and `st.session_state` to remember the logged-in user.
+6. **Keep a secret safe**: the API key lives in a secrets file, not in the code.
 
 ### Cultural / Historical Context | السياق الثقافي / التاريخي
 
@@ -367,11 +322,11 @@ By the end of this project, the student will be able to:
 
 | Skill Area | What the Student Practices |
 |------------|---------------------------|
-| Problem Solving | Turning a real, everyday problem — legal texts that people cannot read — into concrete working steps: upload, parse, chunk, embed, index, retrieve, answer, and handle the case where there is nothing to retrieve. |
-| Computational Thinking | Abstraction (breaking the PDF-to-answer job into small functions in `services/`), data modelling (a `users` table with constraints and two roles), and algorithm design (similarity search with k = 3 and overlapping chunks). |
-| Creativity | Interface design in Streamlit: a bilingual page, Markdown answers that flow right-to-left in Arabic and left-to-right in English, and a two-column landing page that explains the product in one screen. |
-| Collaboration | Working with external services and open-source libraries on someone else's terms — the Gemini API, FAISS, and LangChain — and documenting the result so that anyone else can install it and run it. |
-| Technical Writing | `README.md`, docstrings that explain *why* each module exists, a commented and idempotent database schema, and this bilingual English/Arabic competition document. |
+| Problem Solving | Turning "laws are hard to read" into steps: upload, cut, search, answer. |
+| Computational Thinking | Loops, lists, simple functions, and a scoring algorithm that picks the best 5 parts. |
+| Creativity | Designing a clear menu and screens that show only what each user needs. |
+| Collaboration | Using an online AI service (Gemini) and following its rules and limits. |
+| Technical Writing | The README and this bilingual document. |
 
 ---
 
@@ -444,7 +399,7 @@ ___________difculty of anderstanding egyption law
 | Language | Python 3 |
 | Framework | Streamlit 1.65.0 |
 | Database | SQLite (data/data_base.db) |
-| Libraries | pypdf, langchain-text-splitters, langchain-community (FAISS), langchain-google-genai, google-genai, python-dotenv |
+| Libraries | pypdf, google-genai |
 
 ---
 
@@ -454,12 +409,11 @@ Draw or describe all the screens in your project:
 
 | Screen Name | What the user sees/does | How to get here |
 |-------------|------------------------|-----------------|
-| Landing | The ⚖️ Ma`at title, the subtitle, the disclaimer, the two columns, and the "Log in / Create Account" button. | Open `app.py` with `streamlit run app.py` |
-| Auth — Log in | Email and password boxes and a Login button; a red message if the details are wrong. | The landing page button, or the sidebar |
-| Auth — Create Account | Username, email, 14-digit national ID, password, job and age (18–120), and a Create Account button. | The landing page button, or the sidebar |
-| Chat | Sidebar with the PDF uploader, the loaded-document list, the Summarize button and the saved chats; main area with the conversation and the question box. | Automatically after logging in |
-| Contact Us | Contact email, phone, address, and a name / email / message form. | Sidebar, while logged in |
-| View Users | Cards of every account, three per row, with the national ID masked, plus a tab with the Contact Us messages. | Sidebar, while logged in as an admin |
+| Home | Title, three cards and a Log in button. | Open the app |
+| Log in | Log in and Sign up tabs. | The Home button, or the top menu |
+| Chat | Upload a PDF, ask questions, summarize, saved chats. | Automatically after logging in |
+| Contact us | Contact details and a message form. | Top menu, after logging in |
+| Admin | Users table and contact messages. | Top menu, admin only |
 
 ---
 
@@ -467,16 +421,13 @@ Draw or describe all the screens in your project:
 
 | Feature | What it does | Status |
 |---------|-------------|:------:|
-| Register an account | Checks username, email, 14-digit national ID, password, job and age, then saves the account with the password as a PBKDF2 hash. | ✅ |
-| Log in and log out | Checks email + password; logging out clears the user, the chat, and the document index. | ✅ |
-| Page protection | Protected pages stop and offer a link to the log-in page; View Users is admins only. | ✅ |
-| PDF upload and indexing | Uploads one or more PDFs, reads the text, cuts it into chunks, and builds a FAISS index with Gemini embeddings. | ✅ |
-| Grounded Q&A | Sends the 3 most similar chunks to Gemini, which answers only from them, cites article numbers, and replies in the language of the question. | ✅ |
-| General-knowledge fallback | With no document, or no matching text, Gemini answers from general knowledge and says the answer is not from the documents. | ✅ |
-| Admin user list | Admins see all accounts with the national ID masked; other users are refused. | ✅ |
-| Contact form | A name / email / message form; messages are saved and admins read them on View Users. | ✅ |
-| Document summary | One button gives a plain-language summary of the uploaded PDFs in their own language. | ✅ |
-| Saved chat history | Every chat is saved; the sidebar lists past chats to reopen or delete. | ✅ |
+| Sign up / Log in | Creates an account and logs in; the first user is the admin. | ✅ |
+| Upload a PDF | Reads the text and cuts it into parts. | ✅ |
+| Ask questions | Finds the 5 best parts with embeddings and Gemini answers from them. | ✅ |
+| Summary | Summarizes the whole document. | ✅ |
+| Saved chats | Reopen old chats from the sidebar. | ✅ |
+| Contact us | Sends a message to the admin. | ✅ |
+| Admin page | Shows users and messages. | ✅ |
 
 ---
 

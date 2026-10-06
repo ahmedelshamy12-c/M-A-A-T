@@ -1,114 +1,74 @@
-# Ma`at
+# Ma`at ⚖️
 
-A Streamlit web app that helps people understand Egyptian legal documents —
-laws, contracts, court rulings — by uploading a PDF and asking questions about
-it. Answers are produced by a retrieval-augmented generation (RAG) pipeline:
-the PDF is chunked and indexed with FAISS, the most similar chunks are
-retrieved for the question, and Google Gemini writes the answer.
+A simple website that helps people understand Egyptian legal documents.
+Upload a PDF (a law, a contract or a court ruling), then ask questions about
+it in Arabic or English — type your own or click a suggested question — or
+get a short summary. Google Gemini writes the
+answers.
 
-Features: sign-up / log-in with hashed passwords, PDF upload and indexing,
-grounded Q&A in Arabic or English with article citations, one-click document
-summaries, saved chat history per user, a contact form whose messages admins
-can read, and an admin-only user list with masked national IDs.
+The code is kept on purpose very simple: plain variables, plain functions and
+only three libraries, so a beginner can read all of it.
 
-## Setup
+## How it works (simple RAG)
+
+1. The PDF text is cut into parts of 2000 characters.
+2. Gemini turns every part into a list of numbers (an *embedding*).
+3. Your question is turned into numbers too, and every part gets a score:
+   multiply the two lists number by number and add everything up.
+4. The 5 parts with the highest score are sent to Gemini with your question.
+
+## Run it on your computer
 
 ```bash
 python -m venv .venv
 source .venv/bin/activate          # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 
-cp .env.example .env               # then fill in GOOGLE_API_KEY
-python init_db.py                  # creates data/data_base.db
-streamlit run app.py
+cp .streamlit/secrets.toml.example .streamlit/secrets.toml
+# open .streamlit/secrets.toml and paste your Gemini API key
+
+streamlit run app.py               # run it from this folder
 ```
 
-If you already have a `data/data_base.db` from an older version (no `role`
-column, passwords in plaintext), recreate it with `python init_db.py --reset` —
-that deletes the file, so every account has to be created again.
+Get a free Gemini API key at <https://aistudio.google.com/apikey>.
+The database (`data/data_base.db`) is created automatically.
+**The first person who signs up becomes the admin.**
 
-Log in with an account you create on the **Auth** page, or with the admin
-account below, then open **Chat** to upload PDFs and ask questions.
+## Put it online (Streamlit Community Cloud)
 
-## Models
+1. Go to <https://share.streamlit.io> and sign in with GitHub.
+2. Create app → pick this repository, branch `main`, file `app.py`.
+3. In **Advanced settings → Secrets** paste: `GOOGLE_API_KEY = "your-key"`.
+4. Deploy. Sign up first so that you become the admin.
 
-`GOOGLE_API_KEY` is the only required variable; both models can be swapped from
-`.env` without touching the code:
+The cloud disk is temporary: users and chats are deleted when the app restarts.
 
-| Variable          | Default                | Meaning                                             |
-| ----------------- | ---------------------- | --------------------------------------------------- |
-| `GEMINI_MODEL`    | `gemini-2.5-flash`     | Gemini model that writes the answers                |
-| `EMBEDDING_MODEL` | `gemini-embedding-2` | Embedding model that indexes the uploaded PDFs      |
-
-Both answer and index in Arabic as well as English. If you change
-`EMBEDDING_MODEL`, upload the documents again — an index built with one model
-cannot be searched with another.
-
-## Admin account
-
-An administrator is seeded from the environment — by `init_db.py`, and also
-automatically the first time anyone logs in (so a fresh deployment needs no
-manual step):
-
-| Variable         | Meaning                                             |
-| ---------------- | --------------------------------------------------- |
-| `ADMIN_EMAIL`    | Email of the admin account (created only if missing) |
-| `ADMIN_PASSWORD` | Its password, stored as a PBKDF2 hash               |
-| `ADMIN_USERNAME` | Username, defaults to `admin`                        |
-
-Running `python init_db.py` again is safe: the admin is only created when no
-user with that email exists yet. `python init_db.py --reset` deletes the
-database file first (all accounts and their password hashes are lost).
-
-Only admins can open the **View Users** page, which lists accounts with
-national IDs masked and the messages sent through **Contact Us**.
-
-## Project layout
+## Files
 
 ```
-app.py                  landing page
-init_db.py              creates the database (--reset to start over)
-pages/                  Streamlit multipage UI: auth, chat, contact_us, view_users
-services/db.py          the only place that opens the SQLite database
-services/auth_service.py  sign-up / log-in, password hashing, validation
-services/session.py     require_login() page guard + logout button
-services/chat_history.py   saved conversations, scoped to their owner
-services/contact_service.py  stores and lists Contact Us messages
-services/documents_service.py  PDF -> chunks -> FAISS index
-services/llm_service.py        retrieval + Gemini prompts (answers, summaries)
-data/schema.sql         idempotent database schema
+app.py          start of the app: makes the tables, builds the menu
+services/       small functions, one file per topic:
+  database.py        open the database, create the tables
+  user_service.py    sign up, log in, list users
+  chat_service.py    save and load chats
+  contact_service.py save and list contact messages
+  pdf_service.py     read the PDF, cut it into parts
+  ai_service.py      Gemini: embeddings, best parts, answers, summaries
+app_pages/      the screens: home, login, chat, contact, admin, logout
+data/schema.sql the database tables
 ```
 
-The database lives at `data/data_base.db` (resolved relative to the code, not
-the current directory) and its tables are created automatically on first use.
-Point the `EGY_LAW_DB` environment variable somewhere else to use a different
-file.
+## Limits
 
-## Deploying to Streamlit Community Cloud
-
-1. Sign in at <https://share.streamlit.io> with the GitHub account that owns
-   this repository, then **Create app → Deploy a public app from GitHub**.
-2. Repository: this repo, branch `main`, main file `app.py`. Under
-   **Advanced settings** pick Python 3.12.
-3. In **Secrets**, paste (with your own values):
-
-   ```toml
-   GOOGLE_API_KEY = "..."
-   ADMIN_EMAIL = "..."
-   ADMIN_PASSWORD = "..."
-   ```
-
-   Streamlit exposes top-level secrets as environment variables, which is how
-   the app reads them.
-4. Deploy. The admin account is created the first time anyone logs in.
-
-Community Cloud's disk is temporary: the SQLite database (accounts, saved
-chats, contact messages) is wiped whenever the app restarts or is redeployed.
-That is fine for a demo; a permanent deployment would need a hosted database.
+- Passwords are saved as plain text — this is a learning project.
+- PDFs bigger than 90 parts (about 180,000 characters) are refused, because
+  the free Gemini plan only allows about 100 embeddings per minute.
+- There is no error handling: if Gemini's free quota runs out, the page shows
+  an error. Wait a minute (or until tomorrow for the daily limit) and try again.
+- Scanned PDFs (pictures of text) can't be read, and some Arabic PDFs come out
+  with their words in reverse order.
 
 ## Disclaimer
 
-Ma`at provides general information to help you read and understand legal
-documents. It is **not legal advice** and it is not a substitute for a
-qualified attorney — always consult a licensed lawyer before acting on
-anything the app tells you.
+Ma`at gives general information to help you understand legal documents. It is
+**not legal advice**. Always ask a qualified lawyer before acting on it.

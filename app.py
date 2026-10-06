@@ -1,63 +1,29 @@
+# Ma`at — the start of the app.
+# It makes the database tables and decides which pages the menu shows.
+
 import streamlit as st
-from dotenv import load_dotenv
-import os
 
-# Load environment variables (like API keys)
-load_dotenv()
+from services.database import create_tables
 
-st.set_page_config(
-    page_title=" Ma`at ", page_icon="⚖️", layout="wide"
-)
+st.set_page_config(page_title="Ma`at", page_icon="⚖️", layout="wide")
 
-# Custom Styling
-st.markdown(
-    """
-    <style>
-        .main-title {
-            text-align: center;
-            color: #2c3e50;
-            font-size: 3rem;
-            margin-bottom: 0.5rem;
-        }
-        .subtitle {
-            text-align: center;
-            color: #7f8c8d;
-            margin-bottom: 2rem;
-            font-size: 1.2rem;
-        }
-    </style>
-""",
-    unsafe_allow_html=True,
-)
+create_tables()
 
-# Main Interface
-st.markdown(
-    "<h1 class='main-title'>⚖️ Ma`at</h1>", unsafe_allow_html=True
-)
-st.markdown(
-    "<p class='subtitle'>Smart System for Assisting with Understanding Egyptian Legal Documents</p>",
-    unsafe_allow_html=True,
-)
+home = st.Page("app_pages/home.py", title="Home", icon=":material/home:")
+login = st.Page("app_pages/login.py", title="Log in", icon=":material/login:")
+chat = st.Page("app_pages/chat.py", title="Chat", icon=":material/chat:", default=True)
+contact = st.Page("app_pages/contact.py", title="Contact us", icon=":material/mail:")
+admin = st.Page("app_pages/admin.py", title="Admin", icon=":material/shield_person:")
+logout = st.Page("app_pages/logout.py", title="Log out", icon=":material/logout:")
 
-# Introduction
-st.info(
-    "💡 This assistant provides general information for assistance, but is not a replacement for legal advice from a qualified attorney."
-)
+# Before logging in you only see Home and Log in.
+# After logging in you see the chat; the admin also sees the Admin page.
+if "user" not in st.session_state:
+    pages = [home, login]
+elif st.session_state.user["role"] == "admin":
+    pages = [chat, home, contact, admin, logout]
+else:
+    pages = [chat, home, contact, logout]
 
-col1, col2 = st.columns(2)
-
-with col1:
-    st.markdown("### 📄 Document Summarization")
-    st.write("Upload PDF files (laws, contracts, rulings) and get instant summaries.")
-
-with col2:
-    st.markdown("### 💬 Ask the Assistant")
-    st.write("Ask any question about your documents and the system will provide answers.")
-
-st.divider()
-
-# Call to Action
-st.write("### To get started, please log in or create a new account")
-
-if st.button("Log in / Create Account", type="primary"):
-    st.switch_page("pages/auth.py")
+page = st.navigation(pages, position="top")
+page.run()

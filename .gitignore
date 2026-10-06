@@ -19,3 +19,8 @@ data/*.db-shm
 .vscode/
 .idea/
 .DS_Store
+
+
+
+.agents/
+.claude/
