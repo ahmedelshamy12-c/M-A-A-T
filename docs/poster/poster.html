@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Ma‘at Poster</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&family=Noto+Naskh+Arabic:wght@400;600&family=Noto+Sans+Egyptian+Hieroglyphs&display=swap" rel="stylesheet">
+<style>
+  @page { size: 1010mm 2010mm; margin: 0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: #F3EAD7; }
+  body { -webkit-print-color-adjust: exact; print-color-adjust: exact; font-family: 'Geist', sans-serif; color: #14213D; }
+  .poster { position: relative; width: 1010mm; height: 2010mm; overflow: hidden; background: #F3EAD7; }
+
+  /* ---------- hero (far view) ---------- */
+  .hero { position: absolute; left: 0; top: 0; width: 1010mm; height: 455mm; background: #14213D; overflow: hidden; }
+  .hero .texture { position: absolute; inset: 0; padding: 14mm 20mm; display: flex; flex-wrap: wrap; align-content: flex-start;
+                   justify-content: space-between; column-gap: 16mm; row-gap: 6mm; color: #C9962B; opacity: 0.09; }
+  .hero .texture span { font-size: 34mm; line-height: 1.35; }
+  .hero .texture .ar { font-family: 'Noto Naskh Arabic', serif; }
+  .hero .texture .en { font-family: 'Instrument Serif', serif; font-style: italic; font-size: 38mm; }
+  .hero .texture .hg { font-family: 'Noto Sans Egyptian Hieroglyphs', sans-serif; font-size: 40mm; }
+  .hero .sun { position: absolute; right: 45mm; top: 30mm; width: 350mm; height: 350mm; border-radius: 50%;
+               background: radial-gradient(circle, rgba(201,150,43,0.45) 0%, rgba(201,150,43,0.12) 55%, rgba(201,150,43,0) 72%); }
+  .hero .mark { position: absolute; left: 592mm; top: 62mm; width: 392mm; height: auto; }
+  .hero .text { position: absolute; left: 65mm; top: 62mm; width: 600mm; }
+  .hero .kicker { font-family: 'Geist Mono', monospace; font-size: 15mm; letter-spacing: 0.22em; color: #C9962B; text-transform: uppercase; }
+  .hero h1 { font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 180mm; line-height: 0.9; color: #F3EAD7; margin: 12mm 0 4mm -6mm; letter-spacing: -0.02em; }
+  .hero .tagline { font-family: 'Instrument Serif', serif; font-style: italic; font-size: 64mm; color: #C9962B; line-height: 1; }
+  .hero .promise { font-size: 21mm; line-height: 1.3; color: #F3EAD7; opacity: 0.92; margin-top: 16mm; max-width: 520mm; }
+  .band { position: absolute; left: 0; width: 1010mm; height: 16mm; }
+
+  /* ---------- body (close view) ---------- */
+  .body { position: absolute; left: 35mm; top: 500mm; width: 940mm; }
+  h2 { font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 44mm; line-height: 1; color: #14213D; margin-bottom: 10mm; }
+  h2 .num { font-family: 'Geist Mono', monospace; font-size: 13mm; color: #8F6516; letter-spacing: 0.18em; margin-right: 8mm; vertical-align: 0.35em; }
+  section { margin-bottom: 22mm; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 20mm; }
+  .card { background: #FBF6EC; border: 0.8mm solid rgba(20,33,61,0.14); border-radius: 6mm; padding: 14mm 16mm; }
+  .card.gold { border-color: #C9962B; background: rgba(201,150,43,0.10); }
+  .card h3 { font-size: 17mm; font-weight: 700; margin-bottom: 6mm; }
+  .card p { font-size: 12.5mm; line-height: 1.38; color: #2A3A57; }
+  .label { font-family: 'Geist Mono', monospace; font-size: 9mm; letter-spacing: 0.18em; text-transform: uppercase; color: #1F4E79; margin-bottom: 4mm; }
+
+  .demo { display: grid; grid-template-columns: 590mm 1fr; gap: 18mm; align-items: start; }
+  .shot { border: 0.8mm solid rgba(20,33,61,0.25); border-radius: 5mm; overflow: hidden; background: #fff; }
+  .shot img { display: block; width: 100%; height: 262mm; object-fit: cover; object-position: top left; }
+  .caption { font-size: 10mm; color: #3F5671; margin-top: 5mm; line-height: 1.35; }
+  ul.features { list-style: none; display: grid; gap: 8mm; }
+  ul.features li { display: flex; gap: 6mm; align-items: flex-start; }
+  ul.features .dot { flex: none; width: 7mm; height: 7mm; margin-top: 3.5mm; border-radius: 50%; background: #C9962B; }
+  ul.features strong { font-size: 13mm; font-weight: 700; display: block; }
+  ul.features p { font-size: 10.5mm; line-height: 1.3; color: #3F5671; margin-top: 1.5mm; }
+
+  .diagram { display: block; width: 100%; height: auto; }
+  .figure { background: #FBF6EC; border: 0.8mm solid rgba(20,33,61,0.14); border-radius: 6mm; padding: 6mm; }
+  .figure + .figure { margin-top: 10mm; }
+  .figtitle { font-size: 14mm; font-weight: 700; margin: 2mm 0 2mm 4mm; }
+
+  .footer { position: absolute; left: 35mm; top: 1755mm; width: 940mm; height: 145mm; display: grid; grid-template-columns: 1fr 125mm; gap: 20mm;
+            border-top: 1mm solid #C9962B; padding-top: 10mm; }
+  .tech { display: flex; flex-wrap: wrap; gap: 5mm; margin: 3mm 0 7mm; }
+  .tech span { font-family: 'Geist Mono', monospace; font-size: 11mm; padding: 2.5mm 6mm; border: 0.7mm solid #1F4E79; border-radius: 2mm; color: #1F4E79; }
+  .credits { font-size: 13mm; line-height: 1.45; }
+  .credits strong { font-size: 16mm; }
+  .disclaimer { font-family: 'Instrument Serif', serif; font-style: italic; font-size: 13mm; color: #8F6516; margin-top: 6mm; }
+  .qr { width: 125mm; height: 125mm; border: 1.2mm dashed #1F4E79; border-radius: 4mm; display: flex; flex-direction: column;
+        align-items: center; justify-content: center; text-align: center; color: #1F4E79; font-family: 'Geist Mono', monospace; font-size: 10mm; gap: 4mm; }
+  .qr b { font-size: 15mm; }
+</style>
+</head>
+<body>
+<div class="poster">
+  <div class="hero">
+    <div class="texture"><span class="ar">العدل</span><span class="hg">𓆄</span><span class="en">Justice</span><span class="ar">الحق</span><span class="hg">𓋹</span><span class="en">Truth</span><span class="ar">القانون</span><span class="hg">𓂀</span><span class="en">Law</span><span class="ar">الميزان</span><span class="hg">𓊽</span><span class="en">Balance</span><span class="ar">الحقيقة</span><span class="hg">𓇳</span><span class="en">Order</span><span class="ar">العدل</span><span class="hg">𓆣</span><span class="en">Justice</span><span class="ar">الحق</span><span class="hg">𓆄</span><span class="en">Truth</span><span class="ar">القانون</span><span class="hg">𓋹</span><span class="en">Law</span><span class="ar">الميزان</span><span class="hg">𓂀</span><span class="en">Balance</span><span class="ar">الحقيقة</span><span class="hg">𓊽</span><span class="en">Order</span><span class="ar">العدل</span><span class="hg">𓇳</span><span class="en">Justice</span><span class="ar">الحق</span><span class="hg">𓆣</span><span class="en">Truth</span><span class="ar">القانون</span><span class="hg">𓆄</span><span class="en">Law</span><span class="ar">الميزان</span><span class="hg">𓋹</span><span class="en">Balance</span><span class="ar">الحقيقة</span><span class="hg">𓂀</span><span class="en">Order</span><span class="ar">العدل</span><span class="hg">𓊽</span><span class="en">Justice</span><span class="ar">الحق</span><span class="hg">𓇳</span><span class="en">Truth</span><span class="ar">القانون</span><span class="hg">𓆣</span><span class="en">Law</span><span class="ar">الميزان</span><span class="hg">𓆄</span><span class="en">Balance</span><span class="ar">الحقيقة</span><span class="hg">𓋹</span><span class="en">Order</span></div>
+    <div class="sun"></div>
+    <img class="mark" src="assets/maat-mark.png" alt="Ma‘at logo: the goddess kneeling with wings spread">
+    <div class="text">
+      <div class="kicker">AI legal helper · Egypt</div>
+      <h1>Ma‘at</h1>
+      <div class="tagline">Justice, explained.</div>
+      <p class="promise">Upload an Egyptian law, contract or court ruling. Ask in Arabic or English. Get a clear answer from your own document.</p>
+    </div>
+  </div>
+  <svg class="band" style="top:455mm" viewBox="0 0 1010 16" preserveAspectRatio="none" aria-hidden="true">
+    <rect width="1010" height="16" fill="#C9962B"/><path d="M0,16 L10,0 L20,16 M20,16 L30,0 L40,16 M40,16 L50,0 L60,16 M60,16 L70,0 L80,16 M80,16 L90,0 L100,16 M100,16 L110,0 L120,16 M120,16 L130,0 L140,16 M140,16 L150,0 L160,16 M160,16 L170,0 L180,16 M180,16 L190,0 L200,16 M200,16 L210,0 L220,16 M220,16 L230,0 L240,16 M240,16 L250,0 L260,16 M260,16 L270,0 L280,16 M280,16 L290,0 L300,16 M300,16 L310,0 L320,16 M320,16 L330,0 L340,16 M340,16 L350,0 L360,16 M360,16 L370,0 L380,16 M380,16 L390,0 L400,16 M400,16 L410,0 L420,16 M420,16 L430,0 L440,16 M440,16 L450,0 L460,16 M460,16 L470,0 L480,16 M480,16 L490,0 L500,16 M500,16 L510,0 L520,16 M520,16 L530,0 L540,16 M540,16 L550,0 L560,16 M560,16 L570,0 L580,16 M580,16 L590,0 L600,16 M600,16 L610,0 L620,16 M620,16 L630,0 L640,16 M640,16 L650,0 L660,16 M660,16 L670,0 L680,16 M680,16 L690,0 L700,16 M700,16 L710,0 L720,16 M720,16 L730,0 L740,16 M740,16 L750,0 L760,16 M760,16 L770,0 L780,16 M780,16 L790,0 L800,16 M800,16 L810,0 L820,16 M820,16 L830,0 L840,16 M840,16 L850,0 L860,16 M860,16 L870,0 L880,16 M880,16 L890,0 L900,16 M900,16 L910,0 L920,16 M920,16 L930,0 L940,16 M940,16 L950,0 L960,16 M960,16 L970,0 L980,16 M980,16 L990,0 L1000,16 M1000,16 L1010,0 L1020,16 " fill="none" stroke="#14213D" stroke-width="2"/>
+  </svg>
+
+  <div class="body">
+    <section>
+      <h2><span class="num">01 · WHY</span>Legal text should not need a lawyer to read.</h2>
+      <div class="two">
+        <div class="card">
+          <div class="label">The problem</div>
+          <h3>Dense, costly, and generic</h3>
+          <p>Egyptian laws, contracts and rulings are long and written in legal Arabic. A lawyer is expensive, and general chatbots don’t read <em>your</em> document, so they can be confidently wrong about it.</p>
+        </div>
+        <div class="card gold">
+          <div class="label">Our solution</div>
+          <h3>Ask your own PDF</h3>
+          <p>Ma‘at reads the PDF you upload, finds the parts that answer your question, and explains them in plain Arabic or English, citing the article numbers.</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2><span class="num">02 · SEE IT</span>A real answer, from a real run.</h2>
+      <div class="demo">
+        <div>
+          <div class="shot"><img src="assets/chat-en.png" alt="Ma‘at chat answering an English question about an Arabic sample employment contract"></div>
+          <p class="caption">The contract is in Arabic, the question is in English, so Ma‘at answers in English and cites articles 6 and 8. (Sample contract made for the demo.)</p>
+        </div>
+        <ul class="features">
+          <li><span class="dot"></span><div><strong>Ask in Arabic or English</strong><p>The answer comes back in the language you asked in.</p></div></li>
+<li><span class="dot"></span><div><strong>Answers from your document</strong><p>Only the parts of your PDF that match the question are used.</p></div></li>
+<li><span class="dot"></span><div><strong>Cites the articles</strong><p>Answers point to the article numbers so you can check them.</p></div></li>
+<li><span class="dot"></span><div><strong>One-click questions</strong><p>“What are my rights?”, “Any deadlines?”, “Any penalties?”</p></div></li>
+<li><span class="dot"></span><div><strong>Summarize everything</strong><p>A plain-language summary of rights, duties, deadlines and penalties.</p></div></li>
+<li><span class="dot"></span><div><strong>Saved chats</strong><p>Every conversation is kept for your account.</p></div></li>
+        </ul>
+      </div>
+    </section>
+
+    <section>
+      <h2><span class="num">03 · HOW</span>Simple RAG, simple code.</h2>
+      <div class="figure">
+        <div class="figtitle">How a question gets answered</div>
+        <svg class="diagram" viewBox="0 0 960 308" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="rag-flow-title rag-flow-desc">
+        <title id="rag-flow-title">How a question gets answered</title>
+        <desc id="rag-flow-desc">Ma`at's retrieval flow: a PDF is split and embedded into session state once, then each question is matched to the top 5 parts, which Gemini uses to write the answer.</desc>
+        <defs>
+          <marker id="rag-flow-arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#34506F"/></marker>
+          <marker id="rag-flow-arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#8F6516"/></marker>
+          <marker id="rag-flow-arrow-link" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#2F7D6B"/></marker>
+        </defs>
+        <rect width="100%" height="100%" fill="#FBF6EC"/>
+        <rect x="24" y="24" width="912" height="112" rx="8" fill="rgba(20,33,61,0.02)" stroke="rgba(20,33,61,0.1)" stroke-width="0.8"/>
+        <rect x="36" y="28" width="72" height="12" rx="2" fill="#FBF6EC"/>
+        <text x="72.0" y="37" fill="#3F5671" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.14em">ONCE PER PDF</text>
+        <rect x="24" y="164" width="912" height="140" rx="8" fill="rgba(20,33,61,0.02)" stroke="rgba(20,33,61,0.1)" stroke-width="0.8"/>
+        <rect x="36" y="168" width="80" height="12" rx="2" fill="#FBF6EC"/>
+        <text x="76.0" y="177" fill="#3F5671" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.14em">EVERY QUESTION</text>
+        <path d="M220,84 H276" fill="none" stroke="#34506F" stroke-width="1.2" marker-end="url(#rag-flow-arrow)"/>
+        <path d="M452,84 H508" fill="none" stroke="#34506F" stroke-width="1.2" marker-end="url(#rag-flow-arrow)"/>
+        <rect x="462.0" y="64" width="36" height="12" rx="2" fill="#FBF6EC"/>
+        <text x="480" y="73" fill="#3F5671" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">PARTS</text>
+        <path d="M684,84 H740" fill="none" stroke="#34506F" stroke-width="1.2" marker-end="url(#rag-flow-arrow)"/>
+        <rect x="690.0" y="64" width="44" height="12" rx="2" fill="#FBF6EC"/>
+        <text x="712" y="73" fill="#3F5671" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">VECTORS</text>
+        <path d="M828,112 V144 Q828,152 820,152 H372 Q364,152 364,160 V196" fill="none" stroke="#34506F" stroke-width="1.2" marker-end="url(#rag-flow-arrow)"/>
+        <rect x="558.0" y="132" width="76" height="12" rx="2" fill="#FBF6EC"/>
+        <text x="596" y="141" fill="#3F5671" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">PARTS+VECTORS</text>
+        <path d="M220,224 H276" fill="none" stroke="#34506F" stroke-width="1.2" marker-end="url(#rag-flow-arrow)"/>
+        <path d="M452,224 H508" fill="none" stroke="#8F6516" stroke-width="1.2" marker-end="url(#rag-flow-arrow-accent)"/>
+        <rect x="462.0" y="204" width="36" height="12" rx="2" fill="#FBF6EC"/>
+        <text x="480" y="213" fill="#8F6516" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">TOP 5</text>
+        <path d="M684,224 H740" fill="none" stroke="#34506F" stroke-width="1.2" marker-end="url(#rag-flow-arrow)"/>
+        <path d="M132,252 V276 Q132,284 140,284 H588 Q596,284 596,276 V252" fill="none" stroke="#34506F" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#rag-flow-arrow)"/>
+        <rect x="344.0" y="264" width="40" height="12" rx="2" fill="#FBF6EC"/>
+        <text x="364" y="273" fill="#3F5671" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">NO PDF</text>
+        <rect x="44" y="56" width="176" height="56" rx="6" fill="#FBF6EC"/>
+        <rect x="44" y="56" width="176" height="56" rx="6" fill="rgba(31,78,121,0.1)" stroke="#3F5671" stroke-width="1"/>
+        <rect x="52" y="62" width="32" height="12" rx="2" fill="none" stroke="#3F5671" stroke-opacity="0.5" stroke-width="0.8"/>
+        <text x="68.0" y="71" fill="#3F5671" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.08em">INPUT</text>
+        <text x="132.0" y="90" fill="#14213D" font-size="12" font-weight="600" font-family="'Geist', system-ui, sans-serif" text-anchor="middle">PDF upload</text>
+        <text x="132.0" y="104" fill="#34506F" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">st.file_uploader</text>
+        <rect x="276" y="56" width="176" height="56" rx="6" fill="#FBF6EC"/>
+        <rect x="276" y="56" width="176" height="56" rx="6" fill="#ffffff" stroke="#14213D" stroke-width="1"/>
+        <rect x="284" y="62" width="28" height="12" rx="2" fill="none" stroke="#14213D" stroke-opacity="0.5" stroke-width="0.8"/>
+        <text x="298.0" y="71" fill="#14213D" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.08em">STEP</text>
+        <text x="364.0" y="90" fill="#14213D" font-size="12" font-weight="600" font-family="'Geist', system-ui, sans-serif" text-anchor="middle">Read + split</text>
+        <text x="364.0" y="104" fill="#34506F" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">2000 chars · max 90</text>
+        <rect x="508" y="56" width="176" height="56" rx="6" fill="#FBF6EC"/>
+        <rect x="508" y="56" width="176" height="56" rx="6" fill="#ffffff" stroke="#14213D" stroke-width="1"/>
+        <rect x="516" y="62" width="40" height="12" rx="2" fill="none" stroke="#2F7D6B" stroke-opacity="0.5" stroke-width="0.8"/>
+        <text x="536.0" y="71" fill="#2F7D6B" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.08em">GEMINI</text>
+        <text x="596.0" y="90" fill="#14213D" font-size="12" font-weight="600" font-family="'Geist', system-ui, sans-serif" text-anchor="middle">Embed every part</text>
+        <text x="596.0" y="104" fill="#34506F" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">gemini-embedding-001</text>
+        <rect x="740" y="56" width="176" height="56" rx="6" fill="#FBF6EC"/>
+        <rect x="740" y="56" width="176" height="56" rx="6" fill="rgba(20,33,61,0.05)" stroke="#34506F" stroke-width="1"/>
+        <rect x="748" y="62" width="32" height="12" rx="2" fill="none" stroke="#34506F" stroke-opacity="0.5" stroke-width="0.8"/>
+        <text x="764.0" y="71" fill="#34506F" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.08em">STORE</text>
+        <text x="828.0" y="90" fill="#14213D" font-size="12" font-weight="600" font-family="'Geist', system-ui, sans-serif" text-anchor="middle">Session state</text>
+        <text x="828.0" y="104" fill="#34506F" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">parts · vectors · text</text>
+        <rect x="44" y="196" width="176" height="56" rx="6" fill="#FBF6EC"/>
+        <rect x="44" y="196" width="176" height="56" rx="6" fill="rgba(31,78,121,0.1)" stroke="#3F5671" stroke-width="1"/>
+        <rect x="52" y="202" width="32" height="12" rx="2" fill="none" stroke="#3F5671" stroke-opacity="0.5" stroke-width="0.8"/>
+        <text x="68.0" y="211" fill="#3F5671" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.08em">INPUT</text>
+        <text x="132.0" y="230" fill="#14213D" font-size="12" font-weight="600" font-family="'Geist', system-ui, sans-serif" text-anchor="middle">Question</text>
+        <text x="132.0" y="244" fill="#34506F" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">typed or pill · AR/EN</text>
+        <rect x="276" y="196" width="176" height="56" rx="6" fill="#FBF6EC"/>
+        <rect x="276" y="196" width="176" height="56" rx="6" fill="rgba(201,150,43,0.16)" stroke="#C9962B" stroke-width="1.6"/>
+        <rect x="284" y="202" width="40" height="12" rx="2" fill="none" stroke="#2F7D6B" stroke-opacity="0.5" stroke-width="0.8"/>
+        <text x="304.0" y="211" fill="#2F7D6B" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.08em">GEMINI</text>
+        <text x="364.0" y="230" fill="#14213D" font-size="12" font-weight="600" font-family="'Geist', system-ui, sans-serif" text-anchor="middle">Find best parts</text>
+        <text x="364.0" y="244" fill="#34506F" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">dot product · top 5</text>
+        <rect x="508" y="196" width="176" height="56" rx="6" fill="#FBF6EC"/>
+        <rect x="508" y="196" width="176" height="56" rx="6" fill="#ffffff" stroke="#14213D" stroke-width="1"/>
+        <rect x="516" y="202" width="40" height="12" rx="2" fill="none" stroke="#2F7D6B" stroke-opacity="0.5" stroke-width="0.8"/>
+        <text x="536.0" y="211" fill="#2F7D6B" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.08em">GEMINI</text>
+        <text x="596.0" y="230" fill="#14213D" font-size="12" font-weight="600" font-family="'Geist', system-ui, sans-serif" text-anchor="middle">Write the answer</text>
+        <text x="596.0" y="244" fill="#34506F" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">gemini-2.5-flash</text>
+        <rect x="740" y="196" width="176" height="56" rx="6" fill="#FBF6EC"/>
+        <rect x="740" y="196" width="176" height="56" rx="6" fill="#ffffff" stroke="#14213D" stroke-width="1"/>
+        <rect x="748" y="202" width="40" height="12" rx="2" fill="none" stroke="#14213D" stroke-opacity="0.5" stroke-width="0.8"/>
+        <text x="768.0" y="211" fill="#14213D" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.08em">OUTPUT</text>
+        <text x="828.0" y="230" fill="#14213D" font-size="12" font-weight="600" font-family="'Geist', system-ui, sans-serif" text-anchor="middle">Answer in chat</text>
+        <text x="828.0" y="244" fill="#34506F" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">saved to messages</text>
+        <line x1="32" y1="320" x2="928" y2="320" stroke="rgba(20,33,61,0.1)" stroke-width="0.8"/>
+        <text x="32" y="344" fill="#34506F" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.14em">LEGEND</text>
+        <rect x="112" y="334" width="20" height="14" rx="3" fill="rgba(201,150,43,0.16)" stroke="#8F6516" stroke-width="1"/>
+        <text x="140" y="344" fill="#34506F" font-size="9" font-family="'Geist Mono', ui-monospace, monospace">Retrieval step</text>
+        <rect x="248" y="335" width="20" height="12" rx="2" fill="none" stroke="#2F7D6B" stroke-opacity="0.5" stroke-width="0.8"/>
+        <text x="276" y="344" fill="#34506F" font-size="9" font-family="'Geist Mono', ui-monospace, monospace">Calls Gemini</text>
+        <rect x="372" y="334" width="20" height="14" rx="3" fill="rgba(20,33,61,0.05)" stroke="#34506F" stroke-width="1"/>
+        <text x="400" y="344" fill="#34506F" font-size="9" font-family="'Geist Mono', ui-monospace, monospace">Session store</text>
+        <path d="M504,341 H524" fill="none" stroke="#34506F" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#rag-flow-arrow)"/>
+        <text x="532" y="344" fill="#34506F" font-size="9" font-family="'Geist Mono', ui-monospace, monospace">No PDF uploaded</text>
+      </svg>
+      </div>
+      <div class="figure">
+        <div class="figtitle">How the app is built</div>
+        <svg class="diagram" viewBox="0 0 960 272" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="architecture-title architecture-desc">
+        <title id="architecture-title">How Ma`at is built</title>
+        <desc id="architecture-desc">Architecture of the Ma`at Streamlit app: app.py routes to the chat page and the other pages, which call data services backed by SQLite and AI services backed by the Gemini API.</desc>
+        <defs>
+          <marker id="architecture-arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#34506F"/></marker>
+          <marker id="architecture-arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#8F6516"/></marker>
+          <marker id="architecture-arrow-link" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#2F7D6B"/></marker>
+        </defs>
+        <rect width="100%" height="100%" fill="#FBF6EC"/>
+        <rect x="328" y="40" width="192" height="224" rx="8" fill="rgba(20,33,61,0.02)" stroke="rgba(20,33,61,0.1)" stroke-width="0.8"/>
+        <rect x="340" y="44" width="60" height="12" rx="2" fill="#FBF6EC"/>
+        <text x="370.0" y="53" fill="#3F5671" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.14em">APP_PAGES/</text>
+        <rect x="584" y="40" width="192" height="224" rx="8" fill="rgba(20,33,61,0.02)" stroke="rgba(20,33,61,0.1)" stroke-width="0.8"/>
+        <rect x="596" y="44" width="56" height="12" rx="2" fill="#FBF6EC"/>
+        <text x="624.0" y="53" fill="#3F5671" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.14em">SERVICES/</text>
+        <path d="M144,160 H184" fill="none" stroke="#34506F" stroke-width="1.2" marker-end="url(#architecture-arrow)"/>
+        <path d="M296,148 H312 Q320,148 320,140 V108 Q320,100 328,100 H344" fill="none" stroke="#34506F" stroke-width="1.2" marker-end="url(#architecture-arrow)"/>
+        <path d="M296,172 H312 Q320,172 320,180 V212 Q320,220 328,220 H344" fill="none" stroke="#34506F" stroke-width="1.2" marker-end="url(#architecture-arrow)"/>
+        <path d="M504,88 H600" fill="none" stroke="#34506F" stroke-width="1.2" marker-end="url(#architecture-arrow)"/>
+        <rect x="528.0" y="68" width="48" height="12" rx="2" fill="#FBF6EC"/>
+        <text x="552" y="77" fill="#3F5671" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">ACCOUNTS</text>
+        <path d="M504,208 H544 Q552,208 552,200 V124 Q552,116 560,116 H600" fill="none" stroke="#34506F" stroke-width="1.2" marker-end="url(#architecture-arrow)"/>
+        <rect x="562.0" y="154" width="60" height="12" rx="2" fill="#FBF6EC"/>
+        <text x="592" y="163" fill="#3F5671" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">SAVE CHATS</text>
+        <path d="M504,232 H600" fill="none" stroke="#8F6516" stroke-width="1.2" marker-end="url(#architecture-arrow-accent)"/>
+        <rect x="524.0" y="240" width="56" height="12" rx="2" fill="#FBF6EC"/>
+        <text x="552" y="249" fill="#8F6516" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">QUESTIONS</text>
+        <path d="M760,100 H808" fill="none" stroke="#34506F" stroke-width="1.2" marker-end="url(#architecture-arrow)"/>
+        <rect x="772.0" y="80" width="24" height="12" rx="2" fill="#FBF6EC"/>
+        <text x="784" y="89" fill="#3F5671" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">SQL</text>
+        <path d="M760,220 H808" fill="none" stroke="#2F7D6B" stroke-width="1.2" marker-end="url(#architecture-arrow-link)"/>
+        <rect x="766.0" y="200" width="36" height="12" rx="2" fill="#FBF6EC"/>
+        <text x="784" y="209" fill="#3F5671" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">HTTPS</text>
+        <rect x="32" y="132" width="112" height="56" rx="6" fill="#FBF6EC"/>
+        <rect x="32" y="132" width="112" height="56" rx="6" fill="rgba(31,78,121,0.1)" stroke="#3F5671" stroke-width="1"/>
+        <rect x="40" y="138" width="28" height="12" rx="2" fill="none" stroke="#3F5671" stroke-opacity="0.5" stroke-width="0.8"/>
+        <text x="54.0" y="147" fill="#3F5671" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.08em">USER</text>
+        <text x="88.0" y="166" fill="#14213D" font-size="12" font-weight="600" font-family="'Geist', system-ui, sans-serif" text-anchor="middle">Browser</text>
+        <text x="88.0" y="180" fill="#34506F" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">Arabic / English</text>
+        <rect x="184" y="132" width="112" height="56" rx="6" fill="#FBF6EC"/>
+        <rect x="184" y="132" width="112" height="56" rx="6" fill="#ffffff" stroke="#14213D" stroke-width="1"/>
+        <rect x="192" y="138" width="32" height="12" rx="2" fill="none" stroke="#14213D" stroke-opacity="0.5" stroke-width="0.8"/>
+        <text x="208.0" y="147" fill="#14213D" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.08em">ENTRY</text>
+        <text x="240.0" y="166" fill="#14213D" font-size="12" font-weight="600" font-family="'Geist', system-ui, sans-serif" text-anchor="middle">app.py</text>
+        <text x="240.0" y="180" fill="#34506F" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">st.navigation</text>
+        <rect x="344" y="72" width="160" height="56" rx="6" fill="#FBF6EC"/>
+        <rect x="344" y="72" width="160" height="56" rx="6" fill="#ffffff" stroke="#14213D" stroke-width="1"/>
+        <rect x="352" y="78" width="32" height="12" rx="2" fill="none" stroke="#14213D" stroke-opacity="0.5" stroke-width="0.8"/>
+        <text x="368.0" y="87" fill="#14213D" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.08em">PAGES</text>
+        <text x="424.0" y="106" fill="#14213D" font-size="12" font-weight="600" font-family="'Geist', system-ui, sans-serif" text-anchor="middle">Other pages</text>
+        <text x="424.0" y="120" fill="#34506F" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">login · contact · admin</text>
+        <rect x="344" y="192" width="160" height="56" rx="6" fill="#FBF6EC"/>
+        <rect x="344" y="192" width="160" height="56" rx="6" fill="rgba(201,150,43,0.16)" stroke="#C9962B" stroke-width="1.6"/>
+        <rect x="352" y="198" width="28" height="12" rx="2" fill="none" stroke="#8F6516" stroke-opacity="0.5" stroke-width="0.8"/>
+        <text x="366.0" y="207" fill="#8F6516" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.08em">PAGE</text>
+        <text x="424.0" y="226" fill="#14213D" font-size="12" font-weight="600" font-family="'Geist', system-ui, sans-serif" text-anchor="middle">Chat page</text>
+        <text x="424.0" y="240" fill="#34506F" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">app_pages/chat.py</text>
+        <rect x="600" y="72" width="160" height="56" rx="6" fill="#FBF6EC"/>
+        <rect x="600" y="72" width="160" height="56" rx="6" fill="#ffffff" stroke="#14213D" stroke-width="1"/>
+        <rect x="608" y="78" width="44" height="12" rx="2" fill="none" stroke="#14213D" stroke-opacity="0.5" stroke-width="0.8"/>
+        <text x="630.0" y="87" fill="#14213D" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.08em">MODULES</text>
+        <text x="680.0" y="106" fill="#14213D" font-size="12" font-weight="600" font-family="'Geist', system-ui, sans-serif" text-anchor="middle">Data services</text>
+        <text x="680.0" y="120" fill="#34506F" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">user · chat · contact</text>
+        <rect x="600" y="192" width="160" height="56" rx="6" fill="#FBF6EC"/>
+        <rect x="600" y="192" width="160" height="56" rx="6" fill="#ffffff" stroke="#14213D" stroke-width="1"/>
+        <rect x="608" y="198" width="44" height="12" rx="2" fill="none" stroke="#14213D" stroke-opacity="0.5" stroke-width="0.8"/>
+        <text x="630.0" y="207" fill="#14213D" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.08em">MODULES</text>
+        <text x="680.0" y="226" fill="#14213D" font-size="12" font-weight="600" font-family="'Geist', system-ui, sans-serif" text-anchor="middle">AI services</text>
+        <text x="680.0" y="240" fill="#34506F" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">pdf_service · ai_service</text>
+        <rect x="808" y="72" width="120" height="56" rx="6" fill="#FBF6EC"/>
+        <rect x="808" y="72" width="120" height="56" rx="6" fill="rgba(20,33,61,0.05)" stroke="#34506F" stroke-width="1"/>
+        <rect x="816" y="78" width="32" height="12" rx="2" fill="none" stroke="#34506F" stroke-opacity="0.5" stroke-width="0.8"/>
+        <text x="832.0" y="87" fill="#34506F" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.08em">STORE</text>
+        <text x="868.0" y="106" fill="#14213D" font-size="12" font-weight="600" font-family="'Geist', system-ui, sans-serif" text-anchor="middle">SQLite</text>
+        <text x="868.0" y="120" fill="#34506F" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">data/data_base.db</text>
+        <rect x="808" y="192" width="120" height="56" rx="6" fill="#FBF6EC"/>
+        <rect x="808" y="192" width="120" height="56" rx="6" fill="rgba(20,33,61,0.03)" stroke="rgba(20,33,61,0.3)" stroke-width="1"/>
+        <rect x="816" y="198" width="24" height="12" rx="2" fill="none" stroke="rgba(20,33,61,0.3)" stroke-opacity="0.5" stroke-width="0.8"/>
+        <text x="828.0" y="207" fill="rgba(20,33,61,0.3)" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.08em">EXT</text>
+        <text x="868.0" y="226" fill="#14213D" font-size="12" font-weight="600" font-family="'Geist', system-ui, sans-serif" text-anchor="middle">Gemini API</text>
+        <text x="868.0" y="240" fill="#34506F" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">key in st.secrets</text>
+        <line x1="32" y1="288" x2="928" y2="288" stroke="rgba(20,33,61,0.1)" stroke-width="0.8"/>
+        <text x="32" y="312" fill="#34506F" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.14em">LEGEND</text>
+        <rect x="112" y="302" width="20" height="14" rx="3" fill="rgba(201,150,43,0.16)" stroke="#8F6516" stroke-width="1"/>
+        <text x="140" y="312" fill="#34506F" font-size="9" font-family="'Geist Mono', ui-monospace, monospace">Focal page</text>
+        <path d="M224,309 H244" fill="none" stroke="#34506F" stroke-width="1.2" marker-end="url(#architecture-arrow)"/>
+        <text x="252" y="312" fill="#34506F" font-size="9" font-family="'Geist Mono', ui-monospace, monospace">Internal call</text>
+        <path d="M356,309 H376" fill="none" stroke="#2F7D6B" stroke-width="1.2" marker-end="url(#architecture-arrow-link)"/>
+        <text x="384" y="312" fill="#34506F" font-size="9" font-family="'Geist Mono', ui-monospace, monospace">External API</text>
+        <rect x="480" y="302" width="20" height="14" rx="3" fill="rgba(20,33,61,0.05)" stroke="#34506F" stroke-width="1"/>
+        <text x="508" y="312" fill="#34506F" font-size="9" font-family="'Geist Mono', ui-monospace, monospace">Data store</text>
+      </svg>
+      </div>
+    </section>
+  </div>
+
+  <div class="footer">
+    <div>
+      <div class="label">Built with</div>
+      <div class="tech"><span>Python</span><span>Streamlit</span><span>Google Gemini</span><span>SQLite</span><span>pypdf</span></div>
+      <div class="credits">
+        <strong>Ahmed Medhat</strong> · Techno Future<br>
+        Afro-Asian Technology Competition 2026 · ahedmedhat@gmail.com
+      </div>
+      <p class="disclaimer">Ma‘at explains; it does not replace a lawyer. Not legal advice.</p>
+    </div>
+    <div class="qr"><b>QR</b>try the app<br>link coming soon</div>
+  </div>
+</div>
+</body>
+</html>

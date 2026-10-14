@@ -5,7 +5,7 @@ import streamlit as st
 
 from services.database import create_tables
 
-st.set_page_config(page_title="Ma`at", page_icon="⚖️", layout="wide")
+st.set_page_config(page_title="Ma`at", page_icon="images/icon.png", layout="wide")
 
 create_tables()
 
