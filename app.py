@@ -9,6 +9,9 @@ st.set_page_config(page_title="Ma`at", page_icon="images/icon.png", layout="wide
 
 create_tables()
 
+# The logo in the top-left corner.
+st.logo("images/logo.png", size="large")
+
 home = st.Page("app_pages/home.py", title="Home", icon=":material/home:")
 login = st.Page("app_pages/login.py", title="Log in", icon=":material/login:")
 chat = st.Page("app_pages/chat.py", title="Chat", icon=":material/chat:", default=True)

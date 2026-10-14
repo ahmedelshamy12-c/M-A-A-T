@@ -3,6 +3,8 @@
 
 Project documentation for the LISE Tech Forum software category, 2026.
 
+<p align="center"><img src="../images/logo.png" alt="Ma`at logo" width="480"></p>
+
 ## 1. Project Overview .
 
 | Field | Value |
@@ -143,7 +145,15 @@ Other pages in the project:
 
 ### Screenshots
 
-No screenshots are included in the project files yet.
+| Log in | Sign up |
+|--------|---------|
+| ![Log in screen](schreenshots/login.png) | ![Sign-up screen](schreenshots/register.png) |
+
+![Chat screen with the PDF uploader and suggested questions](schreenshots/chat.png)
+
+Try the app: <https://maat-law.streamlit.app/>
+
+<img src="assets/bing_generated_qrcode.png" alt="QR code for https://maat-law.streamlit.app/" width="148">
 
 - **Home:** Centered Ma`at heading, a short description, a legal-information notice, and two feature summaries.
 - **Authentication:** Login and registration forms presented in separate tabs.
@@ -153,6 +163,7 @@ No screenshots are included in the project files yet.
 
 | Element | Current implementation |
 |---------|------------------------|
+| Logo | Ma`at, the ancient Egyptian goddess of truth and justice, kneeling with her wings spread and an ostrich feather on her head, in tomb-painting colors. Full logo in the top-left corner (`images/logo.png`), the goddess alone on the Home page (`images/mark.png`), a small icon in the browser tab (`images/icon.png`). |
 | Primary color | Dark blue-gray (`#2c3e50`) for the home heading |
 | Secondary color | Gray (`#7f8c8d`) for supporting text |
 | Font | Streamlit default; no custom font configured |

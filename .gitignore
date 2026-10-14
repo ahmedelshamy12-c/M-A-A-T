@@ -24,3 +24,4 @@ data/*.db-shm
 
 .agents/
 .claude/
+.streamlit/

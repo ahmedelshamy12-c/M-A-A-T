@@ -56,16 +56,17 @@
   .figure + .figure { margin-top: 10mm; }
   .figtitle { font-size: 14mm; font-weight: 700; margin: 2mm 0 2mm 4mm; }
 
-  .footer { position: absolute; left: 35mm; top: 1755mm; width: 940mm; height: 145mm; display: grid; grid-template-columns: 1fr 125mm; gap: 20mm;
+  .footer { position: absolute; left: 35mm; top: 1776mm; width: 940mm; height: 124mm; display: grid; grid-template-columns: 1fr 125mm; gap: 20mm;
             border-top: 1mm solid #C9962B; padding-top: 10mm; }
   .tech { display: flex; flex-wrap: wrap; gap: 5mm; margin: 3mm 0 7mm; }
   .tech span { font-family: 'Geist Mono', monospace; font-size: 11mm; padding: 2.5mm 6mm; border: 0.7mm solid #1F4E79; border-radius: 2mm; color: #1F4E79; }
   .credits { font-size: 13mm; line-height: 1.45; }
   .credits strong { font-size: 16mm; }
   .disclaimer { font-family: 'Instrument Serif', serif; font-style: italic; font-size: 13mm; color: #8F6516; margin-top: 6mm; }
-  .qr { width: 125mm; height: 125mm; border: 1.2mm dashed #1F4E79; border-radius: 4mm; display: flex; flex-direction: column;
-        align-items: center; justify-content: center; text-align: center; color: #1F4E79; font-family: 'Geist Mono', monospace; font-size: 10mm; gap: 4mm; }
-  .qr b { font-size: 15mm; }
+  .qr { width: 125mm; display: flex; flex-direction: column; align-items: center; gap: 1.5mm; color: #1F4E79;
+        font-family: 'Geist Mono', monospace; font-size: 7.5mm; text-align: center; }
+  .qr img { width: 92mm; height: 92mm; display: block; }
+  .qr span { white-space: nowrap; }
 </style>
 </head>
 <body>
@@ -325,7 +326,7 @@
       </div>
       <p class="disclaimer">Ma‘at explains; it does not replace a lawyer. Not legal advice.</p>
     </div>
-    <div class="qr"><b>QR</b>try the app<br>link coming soon</div>
+    <div class="qr"><img src="assets/qr-app.svg" alt="QR code linking to maat-law.streamlit.app"><span>Scan to try it</span><span>maat-law.streamlit.app</span></div>
   </div>
 </div>
 </body>

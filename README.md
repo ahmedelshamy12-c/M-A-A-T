@@ -1,4 +1,6 @@
-# Ma`at ⚖️
+<p align="center"><img src="images/logo.png" alt="Ma`at logo" width="480"></p>
+
+# Ma`at
 
 A simple website that helps people understand Egyptian legal documents.
 Upload a PDF (a law, a contract or a court ruling), then ask questions about

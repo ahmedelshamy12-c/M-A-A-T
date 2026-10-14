@@ -1,7 +1,13 @@
 import streamlit as st
 
-st.title("⚖️ Ma`at")
-st.subheader("A smart helper for understanding Egyptian legal documents")
+picture_col, text_col = st.columns([1, 3], vertical_alignment="center")
+
+with picture_col:
+    st.image("images/mark.png")
+
+with text_col:
+    st.title("Ma`at")
+    st.subheader("A smart helper for understanding Egyptian legal documents")
 
 st.info(
     "This app gives general information only. "
