@@ -2,13 +2,13 @@
 
 CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    username TEXT UNIQUE,
-    email TEXT UNIQUE,
-    password TEXT,
-    ssn TEXT,
-    job TEXT,
+    username varchar(50) UNIQUE,
+    email varchar(100) UNIQUE,
+    password varchar(50),
+    ssn varchar(20),
+    job varchar(100),
     age INTEGER,
-    role TEXT,
+    role varchar(20),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS chats (
 CREATE TABLE IF NOT EXISTS messages (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     chat_id INTEGER,
-    sender TEXT,
+    sender varchar(20),
     text TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -30,8 +30,17 @@ CREATE TABLE IF NOT EXISTS messages (
 CREATE TABLE IF NOT EXISTS contact_messages (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER,
-    name TEXT,
-    email TEXT,
+    name varchar(20),
+    email varchar(50),
     message TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+
+
+
+-- drop TABLE Messages;
+-- drop TABLE contact_messagesl
+-- drop table users;
+-- drop table chats ;
+

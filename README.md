@@ -38,7 +38,7 @@ The database (`data/data_base.db`) is created automatically.
 
 1. Go to <https://share.streamlit.io> and sign in with GitHub.
 2. Create app → pick this repository, branch `main`, file `app.py`.
-3. In **Advanced settings → Secrets** paste: `GOOGLE_API_KEY = "your-key"`.
+3. In **Advanced settings > Secrets**, paste `GOOGLE_API_KEY = "your-google-api-key"`.
 4. Deploy. Sign up first so that you become the admin.
 
 The cloud disk is temporary: users and chats are deleted when the app restarts.
