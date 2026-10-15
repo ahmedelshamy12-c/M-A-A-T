@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-**Ma`at** — a Streamlit app that helps people understand Egyptian legal documents: upload a PDF, ask questions (Arabic or English), get a summary. Built for the Afro-Asian technology competition; ``docs/ma`at-documentation.md`` (plus its PDF) is the competition document; the poster is in `docs/poster/`. Work items are in `ISSUES.md`.
+**Ma`at** — a Streamlit app that helps people understand Egyptian legal documents: upload a PDF, ask questions (Arabic or English), get a summary. Built for the LISE Tech Forum (software category, 2026); ``docs/ma`at-documentation.md`` (plus its PDF) is the competition document; the poster is in `docs/poster/`. Work items are in `ISSUES.md`.
 
 **The code must stay beginner-simple** (the user's explicit requirement: "written by a 12-year-old"): plain variables and plain functions, no classes, no type hints, no try/except, no password hashing, no extra libraries beyond `streamlit`, `pypdf`, `google-genai`. Use simple `if` checks for user-facing validation. Don't reintroduce langchain, FAISS, python-dotenv, or an init script.
 

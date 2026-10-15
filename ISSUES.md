@@ -7,7 +7,7 @@
 - Portrait 1000×2000 mm vector PDF built from HTML (+5 mm bleed, 30 mm safe margin, bottom 100 mm empty for the stand), English only.
 - Hero art is a vector illustration (no Higgsfield).
 - Brand: feather-of-Ma'at logo, Nile & gold palette (cream `#F3EAD7`, lapis `#14213D`, Nile `#1F4E79`, gold `#C9962B`, turquoise `#2F7D6B`), tagline "Justice, explained."
-- Sections: hero (vector feather art + wordmark) → problem/solution → how it works (RAG flow + architecture diagrams, re-skinned) → app screenshot (Arabic Q&A on a sample contract) → tech, credits (Ahmed Medhat, Techno Future, Afro-Asian Technology Competition 2026, ahedmedhat@gmail.com), QR code to the live app, not-legal-advice line.
+- Sections: hero (vector feather art + wordmark) → problem/solution → how it works (RAG flow + architecture diagrams, re-skinned) → app screenshot (Arabic Q&A on a sample contract) → tech, credits (Ahmed Medhat, Techno Future, LISE Tech Forum 2026, ahedmedhat@gmail.com), QR code to the live app, not-legal-advice line.
 - QR code for https://maat-law.streamlit.app/ added (sharp SVG copy of `docs/assets/bing_generated_qrcode.png`).
 - Demo document is a sample Arabic employment contract (`docs/poster/demo/`), not a law excerpt: the text of the new Labour Law 14/2025 couldn't be verified.
 - Status: draft done (`docs/poster/`) — awaiting review and print-shop spec

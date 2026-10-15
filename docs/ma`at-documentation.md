@@ -73,7 +73,7 @@ project/
 │   ├── data_base.db               # SQLite database used by the app
 │   └── egy_law_tables.sql         # SQL schema draft
 ├── docs/
-│   └── afro_asian_software_template.md
+│   └── ma`at-documentation.md
 ├── .env                           # Local environment configuration (empty currently)
 └── requirements.txt               # Dependency manifest (empty currently)
 ```
@@ -163,7 +163,7 @@ Try the app: <https://maat-law.streamlit.app/>
 
 | Element | Current implementation |
 |---------|------------------------|
-| Logo | Ma`at, the ancient Egyptian goddess of truth and justice, kneeling with her wings spread and an ostrich feather on her head, in tomb-painting colors. Full logo in the top-left corner (`images/logo.png`), the goddess alone on the Home page (`images/mark.png`), a small icon in the browser tab (`images/icon.png`). |
+| Logo | Ma\`at, the ancient Egyptian goddess of truth and justice, kneeling with her wings spread and an ostrich feather on her head, in tomb-painting colors. Full logo in the top-left corner (`images/logo.png`), the goddess alone on the Home page (`images/mark.png`), a small icon in the browser tab (`images/icon.png`). |
 | Primary color | Dark blue-gray (`#2c3e50`) for the home heading |
 | Secondary color | Gray (`#7f8c8d`) for supporting text |
 | Font | Streamlit default; no custom font configured |
@@ -279,4 +279,4 @@ Account fields are stored in SQLite. A FAISS vector index is intended to hold se
 ---
 
 **Techno Kids, Techno Future**  
-Afro-Asian Tech Forum · Software Category · 2026
+LISE Tech Forum · Software Category · 2026
